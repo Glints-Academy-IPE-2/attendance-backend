@@ -158,7 +158,7 @@ export const verifyUser = async (req, res) => {
       await User.findOne({
         where: { verifiedToken: token },
       });
-    }
+    }  
 
     return successResponse(req, res, 'user is verified');
   } catch (err) {
@@ -186,7 +186,7 @@ export const login = async (req, res) => {
       throw new Error('Incorrect Password');
     }
 
-    if (!user.isVerified && !user.isApproved) {
+    if (!user.isVerified || !user.isApproved) {
       return errorResponse(req, res, 'Please verify your user');
     }
 
