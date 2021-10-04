@@ -1,53 +1,80 @@
-import jwt from "jsonwebtoken";
-import crypto from "crypto";
-import axios from "axios";
-import {
-  User
-} from "../../models";
-import {
-  successResponse,
-  errorResponse,
-  uniqueId
-} from "../../helpers";
+/* eslint-disable consistent-return */
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import axios from 'axios';
+import { User } from '../../models';
+import { successResponse, errorResponse } from '../../helpers';
 
+const nodemailer = require('nodemailer');
+const { google } = require('googleapis');
 const {
   requestPasswordReset,
   resetPassword,
-} = require("../../middleware/authJwt");
-const nodemailer = require("nodemailer")
-const {
-  google
-} = require("googleapis")
+} = require('../../middleware/authJwt');
 
-const CLIENT_ID = "990618082111-ff735j3j5bc1222m0qc4h1bhqr67pomt.apps.googleusercontent.com"
-const CLIENT_SECRET = "5SZD6sV1Bp_O83kHFX0iveXk"
-const REDIRECT_URI = "https://developers.google.com/oauthplayground"
-const REFRESH_TOKEN =
-  "1//0422SCXweBnP3CgYIARAAGAQSNwF-L9IrzLe-gd7fmhwtAxvhd0f61vYVRkIHSwMrU5L9LHldaipe9M8J-7PFYfNQTmqxjTYeBoc"
-const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
+const CLIENT_ID = '990618082111-ff735j3j5bc1222m0qc4h1bhqr67pomt.apps.googleusercontent.com';
+const CLIENT_SECRET = '5SZD6sV1Bp_O83kHFX0iveXk';
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+const REFRESH_TOKEN = '1//0422SCXweBnP3CgYIARAAGAQSNwF-L9IrzLe-gd7fmhwtAxvhd0f61vYVRkIHSwMrU5L9LHldaipe9M8J-7PFYfNQTmqxjTYeBoc';
+const oAuth2Client = new google.auth.OAuth2(
+  CLIENT_ID,
+  CLIENT_SECRET,
+  REDIRECT_URI,
+);
 oAuth2Client.setCredentials({
-  refresh_token: REFRESH_TOKEN
-})
+  refresh_token: REFRESH_TOKEN,
+});
+
+export const sendMail = async ({
+  from = 'This is from IPE <testingalvi@gmail.com>',
+  to = 'example@gmail.com',
+  subject = 'Attendance Apps',
+  text = '<h1>Hello from gmail email using API</h1>',
+  html = '',
+}) => {
+  try {
+    const accessToken = await oAuth2Client.getAccessToken();
+
+    const transport = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        type: 'OAuth2',
+        user: 'testingalvi@gmail.com',
+        clientId: CLIENT_ID,
+        clientSecret: CLIENT_SECRET,
+        refreshToken: REFRESH_TOKEN,
+        accessToken,
+      },
+    });
+
+    const mailOptions = {
+      from,
+      to,
+      subject,
+      text,
+      html,
+    };
+
+    const result = await transport.sendMail(mailOptions);
+    return result;
+  } catch (error) {
+    return error;
+  }
+};
 
 export const register = async (req, res) => {
   try {
     const {
-      name,
-      username,
-      email,
-      password,
-      verifiedToken
+      name, username, email, password,
     } = req.body;
-    if (process.env.IS_GOOGLE_AUTH_ENABLE === "true") {
+    if (process.env.IS_GOOGLE_AUTH_ENABLE === 'true') {
       if (!req.body.code) {
-        throw new Error("code must be defined");
+        throw new Error('code must be defined');
       }
-      const {
-        code
-      } = req.body;
+      const { code } = req.body;
       const customUrl = `${process.env.GOOGLE_CAPTCHA_URL}?secret=${process.env.GOOGLE_CAPTCHA_SECRET_SERVER}&response=${code}`;
       const response = await axios({
-        method: "post",
+        method: 'post',
         url: customUrl,
         data: {
           secret: process.env.GOOGLE_CAPTCHA_SECRET_SERVER,
@@ -55,128 +82,129 @@ export const register = async (req, res) => {
         },
         config: {
           headers: {
-            "Content-Type": "multipart/form-data"
-          }
+            'Content-Type': 'multipart/form-data',
+          },
         },
       });
       if (!(response && response.data && response.data.success === true)) {
-        throw new Error("Google captcha is not valid");
+        throw new Error('Google captcha is not valid');
       }
     }
 
     const user = await User.findOne({
       where: {
-        email
+        email,
       },
     });
     if (user) {
-      throw new Error("User already exists with same email");
+      throw new Error('User already exists with same email');
     }
-    const reqPass = crypto.createHash("md5").update(password).digest("hex");
+
+    const reqPass = crypto.createHash('md5').update(password).digest('hex');
+    const token = jwt.sign(
+      {
+        user: {
+          email: req.body.email,
+          password: req.body.password,
+        },
+      },
+      process.env.SECRET,
+    );
+
     const payload = {
       name,
       username,
       email,
       password: reqPass,
       isVerified: false,
-      verifyToken: uniqueId(),
+      verifiedToken: token,
     };
 
-    const newUser = await User.create(payload);
+    await User.create(payload);
 
-    const token = jwt.sign({
-        user: {
-          email: req.body.email,
-          password: req.body.password,
-        },
-      },
-      process.env.SECRET
-    );
+    sendMail({
+      from: 'This is from IPE <testingalvi@gmail.com>',
+      to: email,
+      subject: `Hello ${req.body.username}`,
+      text: '<h1>Hello from gmail email using API</h1>',
+      html: `Verify token <a href="http://localhost:8000/login?token=${token}&username=${username}">Klik disini<a>`,
+    })
+      .then(result => console.log('Email sent...', result))
+      .catch(error => console.log(error.message));
 
-    // if (req.body.isVerified == 0) {
-      async function sendMail() {
-        try {
-          const accessToken = await oAuth2Client.getAccessToken()
-
-          const transport = nodemailer.createTransport({
-            service: "Gmail",
-            auth: {
-              type: 'OAuth2',
-              user: 'testingalvi@gmail.com',
-              clientId: CLIENT_ID,
-              clientSecret: CLIENT_SECRET,
-              refreshToken: REFRESH_TOKEN,
-              accessToken: accessToken,
-            }
-          })
-
-          const mailOptions = {
-            from: 'This is from IPE <testingalvi@gmail.com>',
-            to: email,
-            subject: `Hello ${req.body.username}`,
-            text: '<h1>Hello from gmail email using API</h1>',
-            html: `Verify token <a href="http://localhost:8000/login?token=${token}&username=${username}">Klik disini<a>`
-          };
-
-          const result = await transport.sendMail(mailOptions)
-          return result
-
-
-        } catch (error) {
-          return error
-        }
-      }
-      sendMail().then(result => console.log("Email sent...", result))
-        .catch(error => console.log(error.message))
-    // } else {
-    //   res.redirect('/api/user/dashboard');
-    // }
-
-
-
-    return successResponse(req, res, {});
+    return successResponse(req, res, {
+      name,
+      username,
+      email,
+      verifiedToken: token,
+    });
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
 };
 
-// .scope("withSecretColumns")
+
+export const verifyUser = async (req, res) => {
+  try {
+    const { body: { token = '' } = {} } = req || {};
+
+    jwt.verify(token, process.env.SECRET);
+
+    const [updated] = await User.update({ isVerified: true }, {
+      where: { verifiedToken: token },
+    });
+
+    if (updated) {
+      await User.findOne({
+        where: { verifiedToken: token },
+      });
+    }
+
+    return successResponse(req, res, 'user is verified');
+  } catch (err) {
+    return errorResponse(req, res, err.message);
+  }
+};
+
 
 export const login = async (req, res) => {
   try {
-    const {
-      email,
-      verifiedToken
-    } = req.body;
+    const { email } = req.body;
     const user = await User.findOne({
       where: {
-        email
+        email,
       },
     });
     if (!user) {
-      throw new Error("Incorrect Email!");
+      throw new Error('Incorrect Email!');
     }
     const reqPass = crypto
-      .createHash("md5")
-      .update(req.body.password || "")
-      .digest("hex");
+      .createHash('md5')
+      .update(req.body.password || '')
+      .digest('hex');
     if (reqPass !== user.password) {
-      throw new Error("Incorrect Password");
+      throw new Error('Incorrect Password');
     }
 
-    // delete user.dataValues.password;
+    if (!user.isVerified && !user.isApproved) {
+      return errorResponse(req, res, 'Please verify your user');
+    }
 
-    // if (req.body.isAdmin === 0) {
+    const token = jwt.sign(
+      {
+        user: {
+          userId: user.id,
+          email: user.email,
+          createdAt: new Date(),
+        },
+      },
+      process.env.SECRET,
+    );
 
-
-
-    // } else {
-    //   return res.redirect("/api/admin/dashboard");
-    // }
-
+    delete user.dataValues.password;
     return successResponse(req, res, {
       user,
-      verifiedToken
+      token,
     });
   } catch (error) {
     return errorResponse(req, res, error.message);
@@ -192,36 +220,30 @@ export const checkVerified = async (req, res) => {
     //   },
     // });
 
-    if (req.params.token === user.verifiedToken) {
-      if (req.params.username === user.username) {
-          return res.redirect('/pub/login')
-      }
-      throw new Error("Username not match!");
-    } else {
-      
-    } 
+    // if (req.params.token === user.verifiedToken) {
+    //   if (req.params.username === user.username) {
+    //     return res.redirect('/pub/login');
+    //   }
+    //   throw new Error('Username not match!');
+    // }
 
-    if (req.params.token !== user.verifiedToken) {
-      throw new Error("Token not match!");
-      
-    }
-
+    // if (req.params.token !== user.verifiedToken) {
+    //   throw new Error('Token not match!');
+    // }
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
-}
-
+};
 
 export const requestResetPasswordController = async (req, res) => {
   try {
     const requestPasswordResetService = await requestPasswordReset(
-      req.body.email
+      req.body.email,
     );
     return res.json(requestPasswordResetService);
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
-
 };
 
 // try {
@@ -260,10 +282,9 @@ export const resetPasswordController = async (req, res) => {
     const resetPasswordService = await resetPassword(
       req.body.userId,
       req.body.token,
-      req.body.password
+      req.body.password,
     );
     return res.json(resetPasswordService);
-
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
@@ -288,23 +309,20 @@ export const resetPasswordController = async (req, res) => {
 
 // res.send("password reset sucessfully.");
 
-
 export const userBoard = (req, res) => {
-  res.status(200).send("User Content.");
+  res.status(200).send('User Content.');
 };
 
 export const profile = async (req, res) => {
   try {
-    const {
-      user
-    } = req.user;
+    const { user } = req.user;
     const userId = await User.findOne({
       where: {
-        id: user
-      }
+        id: user,
+      },
     });
     return successResponse(req, res, {
-      userId
+      userId,
     });
   } catch (error) {
     return errorResponse(req, res, error.message);
@@ -313,25 +331,23 @@ export const profile = async (req, res) => {
 
 export const getUserById = async (req, res) => {
   try {
-    const {
-      id
-    } = req.params;
+    const { id } = req.params;
     const [updated] = await User.update(req.body, {
       where: {
-        id: id,
+        id,
       },
     });
     if (updated) {
       const updatedUser = await User.findOne({
         where: {
-          id: id,
+          id,
         },
       });
       return res.status(200).json({
         user: updatedUser,
       });
     }
-    throw new Error("User not found");
+    throw new Error('User not found');
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
@@ -339,16 +355,19 @@ export const getUserById = async (req, res) => {
 
 export const updateUserById = async (req, res) => {
   try {
-    User.update({
-      name: req.body.name,
-      phone: req.body.phone,
-      password: req.body.password,
-      avatar: req.body.avatar,
-    }, {
-      where: {
-        id: req.params.id
-      }
-    }).then((result) => res.json(result));
+    User.update(
+      {
+        name: req.body.name,
+        phone: req.body.phone,
+        password: req.body.password,
+        avatar: req.body.avatar,
+      },
+      {
+        where: {
+          id: req.params.id,
+        },
+      },
+    ).then(result => res.json(result));
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
@@ -356,18 +375,16 @@ export const updateUserById = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
-    const {
-      id
-    } = req.params;
+    const { id } = req.params;
     const deleted = await User.destroy({
       where: {
-        id: id
+        id,
       },
     });
     if (deleted) {
-      return res.status(204).send("User deleted");
+      return res.status(204).send('User deleted');
     }
-    throw new Error("User not found");
+    throw new Error('User not found');
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
@@ -376,7 +393,7 @@ export const deleteUser = async (req, res) => {
 // not yet
 export const checkIn = async (req, res) => {
   try {
-    return res.status(200).send("todos");
+    return res.status(200).send('todos');
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
@@ -385,7 +402,7 @@ export const checkIn = async (req, res) => {
 // not yet
 export const checkOut = async (req, res) => {
   try {
-    return res.status(200).send("checkout");
+    return res.status(200).send('checkout');
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
@@ -394,7 +411,7 @@ export const checkOut = async (req, res) => {
 // not yet
 export const getLocation = async (req, res) => {
   try {
-    return res.status(200).send("todos");
+    return res.status(200).send('todos');
   } catch (error) {
     return errorResponse(req, res, error.message);
   }

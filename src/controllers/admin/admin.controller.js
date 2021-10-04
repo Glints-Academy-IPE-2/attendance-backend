@@ -1,33 +1,67 @@
-import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
-import axios from 'axios';
+/* eslint-disable consistent-return */
 import {
-  User
+  User,
 } from '../../models';
 import {
   successResponse,
   errorResponse,
-  uniqueId
 } from '../../helpers';
+import { sendMail } from '../user/user.controller';
+
+const jwt = require('jsonwebtoken');
 
 exports.adminBoard = (req, res) => {
-  res.status(200).send("Admin Content.");
+  res.status(200).send('Admin Content.');
+};
+
+export const approveUser = async (req, res) => {
+  try {
+    const { body: { token = '' } = {} } = req || {};
+    jwt.verify(token, process.env.SECRET);
+
+    const [updated] = await User.update({ isApproved: true }, {
+      where: { verifiedToken: token },
+    });
+
+    const user = await User.findOne({
+      where: { verifiedToken: token },
+    });
+
+    console.log(user);
+    
+    if (updated) {
+      const { email, username } = await User.findOne({
+        where: { verifiedToken: token },
+      });
+      sendMail({
+        from: 'This is from IPE <testingalvi@gmail.com>',
+        to: email,
+        subject: `Hello ${username}`,
+        text: '<h1>Hello from gmail email using API</h1>',
+        html: `Verify token <a href="http://localhost:8000/login?token=${token}&username=${username}">Klik disini<a>`,
+      })
+        .then(result => console.log('Email sent...', result))
+        .catch(error => console.log(error.message));
+    }
+
+    return successResponse(req, res, updated);
+  } catch (err) {
+    return errorResponse(req, res, err.message);
+  }
 };
 
 export const getAllUsers = async (req, res) => {
   try {
-    const page = req.params.page || 1;
-    const limit = 2;
     const users = await User.findAndCountAll({
       order: [
         ['createdAt', 'DESC'],
-        ['name', 'ASC']
+        ['name', 'ASC'],
       ],
       // offset: (page - 1) * limit,
       // limit,
     });
     return successResponse(req, res, {
-      users
+      users,
     });
   } catch (error) {
     return errorResponse(req, res, error.message);
@@ -36,37 +70,37 @@ export const getAllUsers = async (req, res) => {
 
 // not yet
 export const allAttendances = async (req, res) => {
+  // eslint-disable-next-line no-empty
   try {
 
 
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
-}
+};
 
 export const getUserById = async (req, res) => {
   try {
     const {
-      id
+      id,
     } = req.params;
     const [updated] = await User.update(req.body, {
       where: {
-        id: id
-      }
+        id,
+      },
     });
     if (updated) {
       const updatedUser = await User.findOne({
         where: {
-          id: id
-        }
+          id,
+        },
       });
       return res.status(200).json({
-        user: updatedUser
-      })
+        user: updatedUser,
+      });
     }
-    throw new Error("User not found");
+    throw new Error('User not found');
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
-}
-
+};

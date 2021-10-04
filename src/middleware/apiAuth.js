@@ -11,9 +11,10 @@ const apiAuth = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.SECRET);
     req.user = decoded.user;
-    const user = await User.scope('withSecretColumns').findOne({
+    const user = await User.findOne({
       where: { email: req.user.email },
     });
+
     if (!user) {
       return errorResponse(req, res, 'User is not found in system', 401);
     }
@@ -22,6 +23,7 @@ const apiAuth = async (req, res, next) => {
     req.user = reqUser;
     return next();
   } catch (error) {
+    console.log(error);
     return errorResponse(
       req,
       res,
