@@ -10,6 +10,10 @@ import {
   uniqueId
 } from "../../helpers";
 
+const {
+  requestPasswordReset,
+  resetPassword,
+} = require("../../middleware/authJwt");
 const nodemailer = require("nodemailer")
 const {
   google
@@ -79,6 +83,57 @@ export const register = async (req, res) => {
     };
 
     const newUser = await User.create(payload);
+
+    const token = jwt.sign({
+        user: {
+          email: req.body.email,
+          password: req.body.password,
+        },
+      },
+      process.env.SECRET
+    );
+
+    // if (req.body.isVerified == 0) {
+      async function sendMail() {
+        try {
+          const accessToken = await oAuth2Client.getAccessToken()
+
+          const transport = nodemailer.createTransport({
+            service: "Gmail",
+            auth: {
+              type: 'OAuth2',
+              user: 'testingalvi@gmail.com',
+              clientId: CLIENT_ID,
+              clientSecret: CLIENT_SECRET,
+              refreshToken: REFRESH_TOKEN,
+              accessToken: accessToken,
+            }
+          })
+
+          const mailOptions = {
+            from: 'This is from IPE <testingalvi@gmail.com>',
+            to: email,
+            subject: `Hello ${req.body.username}`,
+            text: '<h1>Hello from gmail email using API</h1>',
+            html: `Verify token <a href="http://localhost:8000/login?token=${token}&username=${username}">Klik disini<a>`
+          };
+
+          const result = await transport.sendMail(mailOptions)
+          return result
+
+
+        } catch (error) {
+          return error
+        }
+      }
+      sendMail().then(result => console.log("Email sent...", result))
+        .catch(error => console.log(error.message))
+    // } else {
+    //   res.redirect('/api/user/dashboard');
+    // }
+
+
+
     return successResponse(req, res, {});
   } catch (error) {
     return errorResponse(req, res, error.message);
@@ -108,50 +163,16 @@ export const login = async (req, res) => {
     if (reqPass !== user.password) {
       throw new Error("Incorrect Password");
     }
-    const token = jwt.sign({
-        user: {
-          userId: user.id,
-          email: user.email,
-          createdAt: new Date(),
-        },
-      },
-      process.env.SECRET
-    );
-    delete user.dataValues.password;
 
-    async function sendMail() {
-      try {
-        const accessToken = await oAuth2Client.getAccessToken()
+    // delete user.dataValues.password;
 
-        const transport = nodemailer.createTransport({
-          service: "Gmail",
-          auth: {
-            type: 'OAuth2',
-            user: 'testingalvi@gmail.com',
-            clientId: CLIENT_ID,
-            clientSecret: CLIENT_SECRET,
-            refreshToken: REFRESH_TOKEN,
-            accessToken: accessToken,
-          }
-        })
+    // if (req.body.isAdmin === 0) {
 
-        const mailOptions = {
-          from: 'TESTINGALVI 🗿 <testingalvi@gmail.com>',
-          to: email,
-          subject: `Hello ${user.username}`,
-          text: '<h1>Hello from gmail email using API</h1>',
-          html: `Verify token <link>${token}<link>`
-        };
 
-        const result = await transport.sendMail(mailOptions)
-        return result
 
-      } catch (error) {
-        return error
-      }
-    }
-    sendMail().then(result => console.log("Email sent...", result))
-      .catch(error => console.log(error.message))
+    // } else {
+    //   return res.redirect("/api/admin/dashboard");
+    // }
 
     return successResponse(req, res, {
       user,
@@ -162,36 +183,111 @@ export const login = async (req, res) => {
   }
 };
 
-// not yet
-export const forgetPassword = async (req, res) => {
-  const {
-    email
-  } = req.body;
+export const checkVerified = async (req, res) => {
+  try {
+    // const [updated] = await User.findOne(req.body, {
+    //   where: {
+    //     username: req.params.username,
+    //     token: req.params.token
+    //   },
+    // });
 
-  User.findOne({
-    email
-  }, (err, user) => {
-    if (err || !user) {
-      return res.status(400).json({
-        error: "User with this email already exists."
-      });
+    if (req.params.token === user.verifiedToken) {
+      if (req.params.username === user.username) {
+          return res.redirect('/pub/login')
+      }
+      throw new Error("Username not match!");
+    } else {
+      
+    } 
+
+    if (req.params.token !== user.verifiedToken) {
+      throw new Error("Token not match!");
+      
     }
 
-    const token = jwt.sign({
-      name,
-      email,
-      password
-    }, process.env.JWT_ACC_ACTIVATE, {
-      expiresIn: "20m"
-    });
-    const data = {
-      from: 'testingalvi@gmail.com',
-      to: email,
-      subject: `Account Activation Link',
-      html: '<h2>Please click on given link to activate your account</h2><p>${process.env.CLIENT_URL}/authentication/activate${token}</p>`
-    }
-  })
+  } catch (error) {
+    return errorResponse(req, res, error.message);
+  }
+}
+
+
+export const requestResetPasswordController = async (req, res) => {
+  try {
+    const requestPasswordResetService = await requestPasswordReset(
+      req.body.email
+    );
+    return res.json(requestPasswordResetService);
+  } catch (error) {
+    return errorResponse(req, res, error.message);
+  }
+
 };
+
+// try {
+//   const {
+//     email
+//   } = req.body;
+
+//   const user = await User.findOne({
+//     email
+//   });
+//   if (!user)
+//     return res.status(400).send("user with given email doesn't exist");
+
+//   let token = await Token.findOne({
+//     userId: user.id
+//   });
+//   if (!token) {
+//     token = await new Token({
+//       userId: user.id,
+//       token: crypto.randomBytes(32).toString("hex"),
+//     }).save();
+//   }
+
+//   const link = `${process.env.BASE_URL}/password-reset/${user._id}/${token.token}`;
+//   await sendEmail(user.email, "Password reset", link);
+
+//   res.send("password reset link sent to your email account");
+
+// } catch (err) {
+//   return errorResponse(req, res, error.message);
+// }
+
+// not yet
+export const resetPasswordController = async (req, res) => {
+  try {
+    const resetPasswordService = await resetPassword(
+      req.body.userId,
+      req.body.token,
+      req.body.password
+    );
+    return res.json(resetPasswordService);
+
+  } catch (error) {
+    return errorResponse(req, res, error.message);
+  }
+};
+
+// const {
+//   id
+// } = req.params;
+
+// const user = await User.findById(req.params.userId);
+// if (!user) return res.status(400).send("Invalid link or expired");
+
+// const token = await Token.findOne({
+//   userId: user.id,
+//   token: req.params.token
+// });
+// if (!token) return res.status(400).send("Invalid link or expired");
+
+// user.password = req.body.password;
+// await user.save();
+// await token.delete();
+
+// res.send("password reset sucessfully.");
+
 
 export const userBoard = (req, res) => {
   res.status(200).send("User Content.");
@@ -299,46 +395,6 @@ export const checkOut = async (req, res) => {
 export const getLocation = async (req, res) => {
   try {
     return res.status(200).send("todos");
-  } catch (error) {
-    return errorResponse(req, res, error.message);
-  }
-};
-
-
-
-// not yet
-export const resetPassword = async (req, res) => {
-  try {
-    const {
-      userId
-    } = req.user;
-    const user = await User.scope("withSecretColumns").findOne({
-      where: {
-        id: userId
-      },
-    });
-
-    const reqPass = crypto
-      .createHash("md5")
-      .update(req.body.oldPassword)
-      .digest("hex");
-    if (reqPass !== user.password) {
-      throw new Error("Old password is incorrect");
-    }
-
-    const newPass = crypto
-      .createHash("md5")
-      .update(req.body.newPassword)
-      .digest("hex");
-
-    await User.update({
-      password: newPass
-    }, {
-      where: {
-        id: user.id
-      }
-    });
-    return successResponse(req, res, {});
   } catch (error) {
     return errorResponse(req, res, error.message);
   }

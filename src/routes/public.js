@@ -18,8 +18,9 @@ router.post(
   validate(userValidator.register),
   userController.register
 );
-// router.post('/email-activate', userController.activateAccount)
 
-router.get("/forgetPassword", userController.forgetPassword);
+router.post("/requestResetPassword", validate(userValidator.requestResetPassword), userController.requestResetPasswordController);
+
+router.post('resetPassword/:userId/token', validate(userValidator.resetPassword), userController.resetPasswordController)
 
 module.exports = router;

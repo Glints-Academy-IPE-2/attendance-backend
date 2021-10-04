@@ -62,8 +62,14 @@ export const deleteUser = {
     
   }
 }
+export const requestResetPassword = {
+  body: {
+    email: Joi.string().email().required()
+  },  
+}
+
 export const resetPassword = {
   body: {
-    
-  }
+    password: Joi.string().required()
+  },  
 }

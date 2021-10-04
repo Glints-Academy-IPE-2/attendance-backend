@@ -10,6 +10,10 @@ import {
   uniqueId
 } from '../../helpers';
 
+exports.adminBoard = (req, res) => {
+  res.status(200).send("Admin Content.");
+};
+
 export const getAllUsers = async (req, res) => {
   try {
     const page = req.params.page || 1;
@@ -65,3 +69,4 @@ export const getUserById = async (req, res) => {
     return errorResponse(req, res, error.message);
   }
 }
+
