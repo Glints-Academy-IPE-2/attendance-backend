@@ -10,9 +10,6 @@ import { sendMail } from '../user/user.controller';
 
 const jwt = require('jsonwebtoken');
 
-exports.adminBoard = (req, res) => {
-  res.status(200).send('Admin Content.');
-};
 
 export const approveUser = async (req, res) => {
   try {
@@ -27,7 +24,7 @@ export const approveUser = async (req, res) => {
       where: { verifiedToken: token },
     });
 
-    console.log(user);
+    console.log(token);
     
     if (updated) {
       const { email, username } = await User.findOne({
@@ -55,7 +52,7 @@ export const getAllUsers = async (req, res) => {
     const users = await User.findAndCountAll({
       order: [
         ['createdAt', 'DESC'],
-        ['name', 'ASC'],
+        ['username', 'ASC'],
       ],
       // offset: (page - 1) * limit,
       // limit,

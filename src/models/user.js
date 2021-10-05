@@ -1,11 +1,6 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: "user"
-    },
     username: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -24,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     avatar: {
       type: DataTypes.STRING,
       allowNull: true,
+      defaultValue: "default-avatar.png"
     },
     verifiedToken: {
       type: DataTypes.STRING,

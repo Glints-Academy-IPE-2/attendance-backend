@@ -2,7 +2,7 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import axios from 'axios';
-import { User } from '../../models';
+import { User, Attendances } from '../../models';
 import { successResponse, errorResponse } from '../../helpers';
 
 const nodemailer = require('nodemailer');
@@ -65,7 +65,7 @@ export const sendMail = async ({
 export const register = async (req, res) => {
   try {
     const {
-      name, username, email, password,
+      username, email, password,
     } = req.body;
     if (process.env.IS_GOOGLE_AUTH_ENABLE === 'true') {
       if (!req.body.code) {
@@ -93,12 +93,20 @@ export const register = async (req, res) => {
 
     const user = await User.findOne({
       where: {
-        email,
+        email
       },
     });
+    const usernames = await User.findOne({
+      where: {
+        username
+      }
+    })
     if (user) {
       throw new Error('User already exists with same email');
+    } else if (usernames) {
+      throw new Error('User already exists with same username');
     }
+    
 
     const reqPass = crypto.createHash('md5').update(password).digest('hex');
     const token = jwt.sign(
@@ -112,7 +120,6 @@ export const register = async (req, res) => {
     );
 
     const payload = {
-      name,
       username,
       email,
       password: reqPass,
@@ -133,7 +140,6 @@ export const register = async (req, res) => {
       .catch(error => console.log(error.message));
 
     return successResponse(req, res, {
-      name,
       username,
       email,
       verifiedToken: token,
@@ -158,7 +164,9 @@ export const verifyUser = async (req, res) => {
       await User.findOne({
         where: { verifiedToken: token },
       });
-    }  
+    } else {
+      throw new Error('User is not updated.');
+    }
 
     return successResponse(req, res, 'user is verified');
   } catch (err) {
@@ -213,23 +221,7 @@ export const login = async (req, res) => {
 
 export const checkVerified = async (req, res) => {
   try {
-    // const [updated] = await User.findOne(req.body, {
-    //   where: {
-    //     username: req.params.username,
-    //     token: req.params.token
-    //   },
-    // });
-
-    // if (req.params.token === user.verifiedToken) {
-    //   if (req.params.username === user.username) {
-    //     return res.redirect('/pub/login');
-    //   }
-    //   throw new Error('Username not match!');
-    // }
-
-    // if (req.params.token !== user.verifiedToken) {
-    //   throw new Error('Token not match!');
-    // }
+   
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
@@ -246,35 +238,6 @@ export const requestResetPasswordController = async (req, res) => {
   }
 };
 
-// try {
-//   const {
-//     email
-//   } = req.body;
-
-//   const user = await User.findOne({
-//     email
-//   });
-//   if (!user)
-//     return res.status(400).send("user with given email doesn't exist");
-
-//   let token = await Token.findOne({
-//     userId: user.id
-//   });
-//   if (!token) {
-//     token = await new Token({
-//       userId: user.id,
-//       token: crypto.randomBytes(32).toString("hex"),
-//     }).save();
-//   }
-
-//   const link = `${process.env.BASE_URL}/password-reset/${user._id}/${token.token}`;
-//   await sendEmail(user.email, "Password reset", link);
-
-//   res.send("password reset link sent to your email account");
-
-// } catch (err) {
-//   return errorResponse(req, res, error.message);
-// }
 
 // not yet
 export const resetPasswordController = async (req, res) => {
@@ -308,10 +271,6 @@ export const resetPasswordController = async (req, res) => {
 // await token.delete();
 
 // res.send("password reset sucessfully.");
-
-export const userBoard = (req, res) => {
-  res.status(200).send('User Content.');
-};
 
 export const profile = async (req, res) => {
   try {
@@ -357,7 +316,6 @@ export const updateUserById = async (req, res) => {
   try {
     User.update(
       {
-        name: req.body.name,
         phone: req.body.phone,
         password: req.body.password,
         avatar: req.body.avatar,
@@ -384,25 +342,39 @@ export const deleteUser = async (req, res) => {
     if (deleted) {
       return res.status(204).send('User deleted');
     }
+    return res.status(400).send('Failed to delete');
+
     throw new Error('User not found');
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
 };
 
-// not yet
-export const checkIn = async (req, res) => {
+
+export const checkin = async (req, res) => {
   try {
-    return res.status(200).send('todos');
+    // join id attendance to id user
+    Attendances.update(
+      {
+        checkin: req.body.checkin
+      },
+      {
+        where: {
+          id: req.params.id
+        }
+      }
+    ).then(result => res.json(result));
+    // return res.status(200).send('todos');
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
 };
 
-// not yet
-export const checkOut = async (req, res) => {
+
+export const checkout = async (req, res) => {
   try {
-    return res.status(200).send('checkout');
+    const {createdAt} = req.body;
+    // return res.status(200).send('checkout');
   } catch (error) {
     return errorResponse(req, res, error.message);
   }

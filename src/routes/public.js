@@ -12,12 +12,12 @@ const router = express.Router();
 // Public routes
 //= ===============================
 
-router.post('/login', validate(userValidator.login), userController.login);
 router.post(
   '/register',
   validate(userValidator.register),
   userController.register,
 );
+router.post('/login', validate(userValidator.login), userController.login);
 
 router.post('/requestResetPassword', validate(userValidator.requestResetPassword), userController.requestResetPasswordController);
 

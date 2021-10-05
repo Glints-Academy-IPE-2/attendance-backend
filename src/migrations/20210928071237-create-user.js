@@ -8,11 +8,6 @@ module.exports = {
         primaryKey: true,
         type: DataTypes.INTEGER
       },
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: "user"
-      },
       username: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -31,6 +26,7 @@ module.exports = {
       avatar: {
         type: DataTypes.STRING,
         allowNull: true,
+        defaultValue: "default-avatar.png"
       },
       verifiedToken: {
         type: DataTypes.STRING,

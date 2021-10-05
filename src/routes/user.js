@@ -2,7 +2,6 @@ var express = require("express");
 import validate from "express-validation";
 
 import * as userController from "../controllers/user/user.controller";
-import * as controller from "../controllers/dashboard";
 import * as userValidator from "../controllers/user/user.validator";
 
 const router = express.Router();
@@ -21,24 +20,19 @@ const router = express.Router();
 //   userController.deleteUser
 // );
 
-router.get(
-  "/dashboard",
-  controller.userBoard
-);
-
 router.get('/login/:token/:username', userController.checkVerified)
 
-// router.post(
-//     "/checkin",
-//     validate(userValidator.checkIn),
-//     userController.checkIn
-//   );
+router.post(
+    "/checkin",
+    validate(userValidator.checkin),
+    userController.checkin
+  );
 
-// router.post(
-//   "/checkout",
-//   // validate(userValidator.checkOut),
-//   userController.checkOut
-// );
+router.post(
+  "/checkout",
+  validate(userValidator.checkout),
+  userController.checkout
+);
 
 // router.post(
 //   "/resetPassword",

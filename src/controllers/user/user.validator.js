@@ -15,7 +15,6 @@ export const changePassword = {
 
 export const register = {
   body: {
-    name: Joi.string().required(),
     username: Joi.string().required(),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
@@ -41,17 +40,18 @@ export const location = {
   }
 }
 
-export const checkIn = {
+export const checkin = {
   body: {
-
+    checkin: Joi.string().required()
   }
 }
 
-export const checkOut = {
+export const checkout = {
   body: {
-    
+    checkout: Joi.string().required()
   }
 }
+
 export const getLocation = {
   body: {
     

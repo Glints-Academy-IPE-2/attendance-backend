@@ -2,17 +2,42 @@
 const {
   Model
 } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
-  class Attendances extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
+  const Attendances = sequelize.define('Attendances', {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
+    },
+    checkin: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    checkout: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    id_user: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE,
+      defaultValue: new Date()
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE,
+      defaultValue: new Date()
     }
+  }, {});
+  Attendances.associate = function(models) {
+    // associations can be defined here
   };
+
   Attendances.init({
     checkin: DataTypes.DATE,
     checkout: DataTypes.DATE

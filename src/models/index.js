@@ -48,4 +48,11 @@ db.Sequelize = Sequelize;
 // db.User.hasMany(db.Address);
 // db.Address.belongsTo(db.User);
 
+db.Users = require('./user.js')(sequelize, Sequelize);
+db.Attendances = require('./attendances')(sequelize, Sequelize);
+
+db.Attendances.belongsTo(db.Users);
+db.Users.hasMany(db.Attendances);
+
+
 module.exports = db;
