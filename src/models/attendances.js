@@ -35,7 +35,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {});
   Attendances.associate = function(models) {
-    // associations can be defined here
+    Attendances.belongsTo(models.User, {
+      foreignKey: {
+        allowNull: false
+      }
+    })
   };
 
   Attendances.init({

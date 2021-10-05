@@ -51,8 +51,6 @@ db.Sequelize = Sequelize;
 db.Users = require('./user.js')(sequelize, Sequelize);
 db.Attendances = require('./attendances')(sequelize, Sequelize);
 
-db.Attendances.belongsTo(db.Users);
-db.Users.hasMany(db.Attendances);
 
 
 module.exports = db;

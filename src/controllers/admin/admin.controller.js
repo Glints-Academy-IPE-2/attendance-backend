@@ -81,21 +81,36 @@ export const getUserById = async (req, res) => {
     const {
       id,
     } = req.params;
-    const [updated] = await User.update(req.body, {
+
+    const userId = await User.findOne({
       where: {
-        id,
+        id
       },
     });
-    if (updated) {
-      const updatedUser = await User.findOne({
-        where: {
-          id,
-        },
-      });
-      return res.status(200).json({
-        user: updatedUser,
-      });
+    if (userId) {
+      return res.send("User found in database.")
+    } else {
+      throw new Error('User not found in database');
     }
+
+    return successResponse(req, res, {
+      id
+    });
+    // const [updated] = await User.update(req.body, {
+    //   where: {
+    //     id,
+    //   },
+    // });
+    // if (updated) {
+    //   const updatedUser = await User.findOne({
+    //     where: {
+    //       id,
+    //     },
+    //   });
+    //   return res.status(200).json({
+    //     user: updatedUser,
+    //   });
+    // }
     throw new Error('User not found');
   } catch (error) {
     return errorResponse(req, res, error.message);
