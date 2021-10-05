@@ -1,18 +1,17 @@
-let Sequelize = require("sequelize"),
+const Sequelize = require('sequelize');
 
 let sequelize;
 
 if (process.env.HEROKU_POSTGRESQL_BRONZE_URL) {
   sequelize = new Sequelize(process.env.HEROKU_POSTGRESQL_BRONZE_URL,
 
-  {
-  dialect: "postgres",
-  protocol: "postgres",
-  port: 5432,
-  host: "<heroku host>",
-  logging: true //false
-  });
-
+    {
+      dialect: 'postgres',
+      protocol: 'postgres',
+      port: 5432,
+      host: 'd260lo34p30fvl',
+      logging: true, // false
+    });
 } else {
   sequelize = new Sequelize(
     process.env.DB_NAME,
@@ -34,5 +33,3 @@ sequelize
   .catch((err) => {
     console.error('Unable to connect to the database:', err);
   });
-
-
