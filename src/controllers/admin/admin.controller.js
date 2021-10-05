@@ -87,31 +87,12 @@ export const getUserById = async (req, res) => {
         id
       },
     });
-    if (userId) {
-      return res.send("User found in database.")
-    } else {
+   
+    if(!userId) {
       throw new Error('User not found in database');
+    } else {
+      return successResponse(req, res, {userId})
     }
-
-    return successResponse(req, res, {
-      id
-    });
-    // const [updated] = await User.update(req.body, {
-    //   where: {
-    //     id,
-    //   },
-    // });
-    // if (updated) {
-    //   const updatedUser = await User.findOne({
-    //     where: {
-    //       id,
-    //     },
-    //   });
-    //   return res.status(200).json({
-    //     user: updatedUser,
-    //   });
-    // }
-    throw new Error('User not found');
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
