@@ -228,13 +228,9 @@ export const checkVerified = async (req, res) => {
 };
 
 export const requestResetPasswordController = async (req, res) => {
-  try {
-    const requestPasswordResetService = await requestPasswordReset(
-      req.body.email,
-    );
-    return res.json(requestPasswordResetService);
-  } catch (error) {
-    return errorResponse(req, res, error.message);
+  const email = await User.findOne({where: {email: req.body.email}});
+  if (email == null)  {
+    throw new Error('Email not found');
   }
 };
 

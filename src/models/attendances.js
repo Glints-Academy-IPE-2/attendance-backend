@@ -36,9 +36,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Attendances.associate = function(models) {
     Attendances.belongsTo(models.User, {
-      foreignKey: {
-        allowNull: false
-      }
+      
     })
   };
 
