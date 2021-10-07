@@ -6,7 +6,7 @@ module.exports = {
       username: 'alviGeo',
       email: 'testingalvi@gmail.com',
       password: 'test123',
-      isAdmin: 1,
+      isAdmin: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     }]);
