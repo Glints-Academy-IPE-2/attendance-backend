@@ -11,7 +11,7 @@ router.delete('/delete-user/:userId', adminController.deleteUserById);
 
 router.get('/get-attendance', adminController.getAllAttendance)
 router.get('/get-attendance/:id', adminController.getAttendanceById)
-// router.get('/get-late-attendance/:id', adminController.getLateAttendance)
+router.get('/get-late-attendance', adminController.getLateAttendance)
 
 
 module.exports = router;
