@@ -16,7 +16,7 @@ const jwt = require('jsonwebtoken');
 
 export const approveUser = async (req, res) => {
   try {
-    // const { body: { token = '' } = {} } = req || {};
+    
 
     const {
       token,

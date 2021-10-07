@@ -164,14 +164,7 @@ export const register = async (req, res) => {
 
 export const verifyUser = async (req, res) => {
   try {
-    // const {
-    //   params: {
-    //     token = ''
-    //   } = {}
-    // } = req || {};
-
     const {token} = req.params
-
     jwt.verify(token, process.env.SECRET);
 
     const [updated] = await User.update({
@@ -263,13 +256,6 @@ export const requestResetPasswordController = async (req, res) => {
     if (!user) {
       throw new Error('Email not found');
     }
-    // const token = jwt.sign({
-    //   user: {
-    //     email,
-
-    //   }
-    // }, process.env.SECRET
-    // )
 
     sendMail({
       from: 'This is from IPE <testingalvi@gmail.com>',
