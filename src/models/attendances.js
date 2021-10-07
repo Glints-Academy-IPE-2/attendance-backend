@@ -1,6 +1,7 @@
-'use strict';
+
+
 const {
-  Model
+  Model,
 } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
@@ -9,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
-      type: DataTypes.INTEGER
+      type: DataTypes.INTEGER,
     },
     checkin: {
       type: DataTypes.DATE,
@@ -21,30 +22,30 @@ module.exports = (sequelize, DataTypes) => {
     },
     id_user: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      defaultValue: new Date()
+      defaultValue: new Date(),
     },
     updatedAt: {
       allowNull: false,
       type: DataTypes.DATE,
-      defaultValue: new Date()
-    }
+      defaultValue: new Date(),
+    },
   }, {});
-  Attendances.associate = function(models) {
+  Attendances.associate = function (models) {
     Attendances.belongsTo(models.User, {
       foreignKey: {
-        allowNull: false
-      }
-    })
+        allowNull: false,
+      },
+    });
   };
 
   Attendances.init({
     checkin: DataTypes.DATE,
-    checkout: DataTypes.DATE
+    checkout: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'Attendances',

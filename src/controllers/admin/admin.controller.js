@@ -25,7 +25,7 @@ export const approveUser = async (req, res) => {
     });
 
     console.log(token);
-    
+
     if (updated) {
       const { email, username } = await User.findOne({
         where: { verifiedToken: token },
@@ -84,17 +84,17 @@ export const getUserById = async (req, res) => {
 
     const userId = await User.findOne({
       where: {
-        id
+        id,
       },
     });
     if (userId) {
-      return res.send("User found in database.")
-    } else {
-      throw new Error('User not found in database');
+      return res.send('User found in database.');
     }
+    throw new Error('User not found in database');
+
 
     return successResponse(req, res, {
-      id
+      id,
     });
     // const [updated] = await User.update(req.body, {
     //   where: {

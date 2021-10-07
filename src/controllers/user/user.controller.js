@@ -194,9 +194,9 @@ export const login = async (req, res) => {
       throw new Error('Incorrect Password');
     }
 
-    if (!user.isVerified || !user.isApproved) {
-      return errorResponse(req, res, 'Please verify your user');
-    }
+    // if (!user.isVerified || !user.isApproved) {
+    //   return errorResponse(req, res, 'Please verify your user');
+    // }
 
     const token = jwt.sign(
       {
