@@ -2,9 +2,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.bulkInsert('Attendance', [{
-      checkin: new Date(),
-      checkout: new Date(),
+    return queryInterface.bulkInsert('Attendances', [{
       
       createdAt: new Date(),
       updatedAt: new Date()
@@ -12,6 +10,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete('Attendance', null, {});
+    return queryInterface.bulkDelete('Attendances', null, {});
   }
 };

@@ -27,6 +27,8 @@
     "express": "^4.16.4",
     "express-joi-validator": "^2.0.1",
     "express-validation": "^1.0.2",
+    "geolocation": "^0.2.0",
+    "geolocator": "^2.1.5",
     "googleapis": "^87.0.0",
     "http": "0.0.0",
     "jest": "^24.8.0",

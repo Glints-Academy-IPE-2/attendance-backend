@@ -16,7 +16,7 @@ module.exports = {
         type: DataTypes.DATE,
         allowNull: true,
       },
-      id_user: {
+      UserId: {
         type: DataTypes.STRING,
         allowNull: false
       },

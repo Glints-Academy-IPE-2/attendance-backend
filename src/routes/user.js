@@ -14,35 +14,11 @@ const router = express.Router();
 //   userController.updateUserById
 // );
 
-// router.delete(
-//   "/deleteUser",
-//   validate(userValidator.deleteUser),
-//   userController.deleteUser
-// );
-
 router.get('/login/:token/:username', userController.checkVerified)
 
-router.post(
-    "/checkin",
-    validate(userValidator.checkin),
-    userController.checkin
-  );
+router.post("/checkin/:id", validate(userValidator.checkin),userController.checkin);
+router.post( "/checkout/:id", validate(userValidator.checkout),userController.checkout);
 
-router.post(
-  "/checkout",
-  validate(userValidator.checkout),
-  userController.checkout
-);
+router.put("/location/:id", userController.getLocation);
 
-// router.post(
-//   "/resetPassword",
-//   validate(userValidator.resetPassword),
-//   userController.resetPassword
-// );
-
-// router.get(
-//   "/location",
-//   validate(userValidator.getLocation),
-//   userController.getLocation
-// );
 module.exports = router;

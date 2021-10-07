@@ -1,5 +1,3 @@
-
-
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
@@ -9,6 +7,7 @@ const env = process.env.NODE_ENV || 'development';
 // eslint-disable-next-line import/no-dynamic-require
 const config = require(`${__dirname}/../config/config.js`)[env];
 const db = {};
+
 
 let sequelize;
 if (config.use_env_variable) {
@@ -37,8 +36,8 @@ Object.keys(db).forEach((modelName) => {
   }
 });
 
-db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+db.sequelize = sequelize;
 
 // relationships for models
 
@@ -48,9 +47,14 @@ db.Sequelize = Sequelize;
 // db.User.hasMany(db.Address);
 // db.Address.belongsTo(db.User);
 
-db.Users = require('./user.js')(sequelize, Sequelize);
-db.Attendances = require('./attendances')(sequelize, Sequelize);
+db.user = require('./user.js')(sequelize, Sequelize);
+db.attendance = require('./attendance.js')(sequelize, Sequelize);
 
+db.user.hasMany(db.attendance, { as: "attendance" });
+db.attendance.belongsTo(db.user, {
+  foreignKey: "id",
+  as: "user",
+});
 
 
 module.exports = db;

@@ -71,5 +71,6 @@ export const requestResetPassword = {
 export const resetPassword = {
   body: {
     password: Joi.string().required()
+    
   },  
 }

@@ -18,11 +18,10 @@ router.post(
   userController.register,
 );
 router.post('/login', validate(userValidator.login), userController.login);
+router.get('/verify-user/:token', userController.verifyUser);
 
 router.post('/requestResetPassword', validate(userValidator.requestResetPassword), userController.requestResetPasswordController);
+router.post('/resetPassword/:email/:token', userController.resetPasswordController);
 
-router.post('resetPassword/:userId/token', validate(userValidator.resetPassword), userController.resetPasswordController);
-
-router.get('/verify-user', userController.verifyUser);
 
 module.exports = router;

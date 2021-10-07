@@ -1,4 +1,6 @@
 'use strict';
+// const models = require('./index');
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     username: {
@@ -44,18 +46,16 @@ module.exports = (sequelize, DataTypes) => {
     latitude: {
       type: DataTypes.FLOAT,
       allowNull: true,
-      defaultValue: -112256432
+      defaultValue: null
     },
     longitude: {
       type: DataTypes.FLOAT,
       allowNull: true,
-      defaultValue: -121456432
+      defaultValue: null
     },
   }, {});
-  User.associate = function(models) {
-    User.hasMany(models.Attendances, {
-      
-    })
+  User.associate = function (models) {
+    // User.hasMany(model.attendance,{as: 'attendance', foreignKey: 'id'})
   };
   return User;
 };

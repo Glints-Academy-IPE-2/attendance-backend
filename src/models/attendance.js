@@ -1,8 +1,4 @@
-
-
-const {
-  Model,
-} = require('sequelize');
+'use strict';
 
 module.exports = (sequelize, DataTypes) => {
   const Attendances = sequelize.define('Attendances', {
@@ -20,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    id_user: {
+    UserId: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -36,11 +32,6 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {});
   Attendances.associate = function (models) {
-    Attendances.belongsTo(models.User, {
-      foreignKey: {
-        allowNull: false,
-      },
-    });
   };
 
   Attendances.init({

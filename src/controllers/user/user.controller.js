@@ -2,11 +2,19 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import axios from 'axios';
-import { User, Attendances } from '../../models';
-import { successResponse, errorResponse } from '../../helpers';
+import {
+  successResponse,
+  errorResponse
+} from '../../helpers';
 
+const db = require("../../models");
+const User = db.user;
+const Attendance = db.attendance;
+// send email 
 const nodemailer = require('nodemailer');
-const { google } = require('googleapis');
+const {
+  google
+} = require('googleapis');
 const {
   requestPasswordReset,
   resetPassword,
@@ -65,13 +73,17 @@ export const sendMail = async ({
 export const register = async (req, res) => {
   try {
     const {
-      username, email, password,
+      username,
+      email,
+      password,
     } = req.body;
     if (process.env.IS_GOOGLE_AUTH_ENABLE === 'true') {
       if (!req.body.code) {
         throw new Error('code must be defined');
       }
-      const { code } = req.body;
+      const {
+        code
+      } = req.body;
       const customUrl = `${process.env.GOOGLE_CAPTCHA_URL}?secret=${process.env.GOOGLE_CAPTCHA_SECRET_SERVER}&response=${code}`;
       const response = await axios({
         method: 'post',
@@ -106,11 +118,10 @@ export const register = async (req, res) => {
     } else if (usernames) {
       throw new Error('User already exists with same username');
     }
-    
+
 
     const reqPass = crypto.createHash('md5').update(password).digest('hex');
-    const token = jwt.sign(
-      {
+    const token = jwt.sign({
         user: {
           email: req.body.email,
           password: req.body.password,
@@ -130,12 +141,12 @@ export const register = async (req, res) => {
     await User.create(payload);
 
     sendMail({
-      from: 'This is from IPE <testingalvi@gmail.com>',
-      to: email,
-      subject: `Hello ${req.body.username}`,
-      text: '<h1>Hello from gmail email using API</h1>',
-      html: `Verify token <a href="http://localhost:8000/login?token=${token}&username=${username}">Klik disini<a>`,
-    })
+        from: 'This is from IPE <testingalvi@gmail.com>',
+        to: email,
+        subject: `Hello ${req.body.username}`,
+        text: '<h1>Hello from gmail email using API</h1>',
+        html: `Verify token <a href="http://localhost:3000/login?token=${token}&username=${username}">Klik disini<a>`,
+      })
       .then(result => console.log('Email sent...', result))
       .catch(error => console.log(error.message));
 
@@ -152,17 +163,22 @@ export const register = async (req, res) => {
 
 export const verifyUser = async (req, res) => {
   try {
-    const { body: { token = '' } = {} } = req || {};
-
+    const {token} = req.params
     jwt.verify(token, process.env.SECRET);
 
-    const [updated] = await User.update({ isVerified: true }, {
-      where: { verifiedToken: token },
+    const [updated] = await User.update({
+      isVerified: true
+    }, {
+      where: {
+        verifiedToken: token
+      },
     });
 
     if (updated) {
       await User.findOne({
-        where: { verifiedToken: token },
+        where: {
+          verifiedToken: token
+        },
       });
     } else {
       throw new Error('User is not updated.');
@@ -177,7 +193,9 @@ export const verifyUser = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email } = req.body;
+    const {
+      email
+    } = req.body;
     const user = await User.findOne({
       where: {
         email,
@@ -198,8 +216,7 @@ export const login = async (req, res) => {
     //   return errorResponse(req, res, 'Please verify your user');
     // }
 
-    const token = jwt.sign(
-      {
+    const token = jwt.sign({
         user: {
           userId: user.id,
           email: user.email,
@@ -221,7 +238,7 @@ export const login = async (req, res) => {
 
 export const checkVerified = async (req, res) => {
   try {
-   
+
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
@@ -229,52 +246,82 @@ export const checkVerified = async (req, res) => {
 
 export const requestResetPasswordController = async (req, res) => {
   try {
-    const requestPasswordResetService = await requestPasswordReset(
-      req.body.email,
-    );
-    return res.json(requestPasswordResetService);
+    const {email} = req.body
+    const user = await User.findOne({
+      where: {
+        email
+      }
+    });
+    if (!user) {
+      throw new Error('Email not found');
+    }
+
+    sendMail({
+      from: 'This is from IPE <testingalvi@gmail.com>',
+      to: email,
+      subject: `Reset Password`,
+      text: '<h1>Hello from gmail email using API</h1>',
+      html: `Reset password <a href="http://localhost:3000/resetPassword?email=${email}&token=${user.verifiedToken}">Klik disini<a>`,
+    })
+    .then(result => console.log('Password reset link sent to your email account', result))
+    .catch(error => console.log(error.message));
+
+    return successResponse(req, res, {})
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
 };
 
 
-// not yet
 export const resetPasswordController = async (req, res) => {
   try {
-    const resetPasswordService = await resetPassword(
-      req.body.userId,
-      req.body.token,
-      req.body.password,
-    );
-    return res.json(resetPasswordService);
+    const {email, token} = req.params;
+    const {password} = req.body;
+    const updatePassword = await crypto.createHash('md5').update(password).digest('hex');
+    
+    jwt.verify(token, process.env.SECRET);
+
+    const [updated] = await User.update({
+      password: updatePassword
+    }, {
+      where: {
+        email: email,
+        verifiedToken: token
+      },
+    });
+    
+    if (updated) {
+      await User.findOne({
+        where: {
+          password: updatePassword
+        },
+      });
+    } else {
+      throw new Error('User is not updated')
+    }
+
+    sendMail({
+      from: 'This is from IPE <testingalvi@gmail.com>',
+      to: `Hello ${email}`,
+      subject: `Reset Password`,
+      text: '<h1>Hello from gmail email using API</h1>',
+      html: `Reset password success.<a>`,
+    })
+    .then(result => console.log('password reset sucessfully.', result))
+    .catch(error => console.log(error.message));
+
+    return successResponse(req, res, {updatePassword})
+    
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
 };
-
-// const {
-//   id
-// } = req.params;
-
-// const user = await User.findById(req.params.userId);
-// if (!user) return res.status(400).send("Invalid link or expired");
-
-// const token = await Token.findOne({
-//   userId: user.id,
-//   token: req.params.token
-// });
-// if (!token) return res.status(400).send("Invalid link or expired");
-
-// user.password = req.body.password;
-// await user.save();
-// await token.delete();
-
-// res.send("password reset sucessfully.");
 
 export const profile = async (req, res) => {
   try {
-    const { user } = req.user;
+    const {
+      user
+    } = req.params;
     const userId = await User.findOne({
       where: {
         id: user,
@@ -290,7 +337,10 @@ export const profile = async (req, res) => {
 
 export const getUserById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const {
+      id
+    } = req.params;
+    
     const [updated] = await User.update(req.body, {
       where: {
         id,
@@ -314,77 +364,72 @@ export const getUserById = async (req, res) => {
 
 export const updateUserById = async (req, res) => {
   try {
-    User.update(
-      {
-        phone: req.body.phone,
-        password: req.body.password,
-        avatar: req.body.avatar,
-      },
-      {
-        where: {
-          id: req.params.id,
-        },
-      },
-    ).then(result => res.json(result));
-  } catch (error) {
-    return errorResponse(req, res, error.message);
-  }
-};
-
-export const deleteUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const deleted = await User.destroy({
+    User.update({
+      phone: req.body.phone,
+      password: req.body.password,
+      avatar: req.body.avatar,
+    }, {
       where: {
-        id,
+        id: req.params.id,
       },
-    });
-    if (deleted) {
-      return res.status(204).send('User deleted');
-    }
-    return res.status(400).send('Failed to delete');
-
-    throw new Error('User not found');
+    }, ).then(result => res.json(result));
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
 };
-
 
 export const checkin = async (req, res) => {
   try {
-    // join id attendance to id user
-    Attendances.update(
-      {
-        checkin: req.body.checkin
-      },
-      {
-        where: {
-          id: req.params.id
-        }
-      }
-    ).then(result => res.json(result));
-    // return res.status(200).send('todos');
+    const {id} = req.params;
+    const {checkin} = req.body;
+
+    Attendance.create({
+      checkin: checkin,
+      UserId: id
+    })
+    .then((attendance) => {
+      successResponse(req, res, {attendance})
+    })
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
 };
-
 
 export const checkout = async (req, res) => {
   try {
-    const {createdAt} = req.body;
-    // return res.status(200).send('checkout');
+    const {id} = req.params;
+    const {checkout} = req.body;
+
+    Attendance.create({
+      checkout: checkout,
+      UserId: id
+    })
+    .then((attendance) => {
+      successResponse(req, res, {attendance})
+    })
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
 };
 
-// not yet
-export const getLocation = async (req, res) => {
-  try {
-    return res.status(200).send('todos');
+
+export const getLocation = async (req, res, next) => {
+  try{
+  const {latitude, longitude} = req.body;
+    const {id} = req.params;
+
+    const insertLocation = await User.update({
+      latitude: latitude,
+      longitude: longitude
+    }, {
+      where: {
+        id: id
+      }
+    }).then(function(rowsUpdated) {
+     successResponse(req, res, {rowsUpdated})
+    })
+    .catch(next)
   } catch (error) {
-    return errorResponse(req, res, error.message);
+    return errorResponse(req, res, error.message)
   }
 };
