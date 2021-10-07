@@ -1,4 +1,5 @@
-'use strict';
+
+
 // const models = require('./index');
 
 module.exports = (sequelize, DataTypes) => {
@@ -6,52 +7,52 @@ module.exports = (sequelize, DataTypes) => {
     username: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: "username"
+      defaultValue: 'username',
     },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: "user@gmail.com"
+      defaultValue: 'user@gmail.com',
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: "userpass"
+      defaultValue: 'userpass',
     },
     avatar: {
       type: DataTypes.STRING,
       allowNull: true,
-      defaultValue: "default-avatar.png"
+      defaultValue: 'default-avatar.png',
     },
     verifiedToken: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: "123"
+      defaultValue: '123',
     },
     isAdmin: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 1
+      defaultValue: false,
     },
     isApproved: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0,
+      defaultValue: false,
     },
     isVerified: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: 0
+      defaultValue: false,
     },
     latitude: {
       type: DataTypes.FLOAT,
       allowNull: true,
-      defaultValue: null
+      defaultValue: 0.0,
     },
     longitude: {
       type: DataTypes.FLOAT,
       allowNull: true,
-      defaultValue: null
+      defaultValue: 0.0,
     },
   }, {});
   User.associate = function (models) {
