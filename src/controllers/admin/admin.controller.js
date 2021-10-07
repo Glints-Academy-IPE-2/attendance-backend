@@ -18,8 +18,6 @@ const jwt = require('jsonwebtoken');
 
 export const approveUser = async (req, res) => {
   try {
-
-
     const {
       token,
     } = req.params;
@@ -56,7 +54,7 @@ export const approveUser = async (req, res) => {
           to: email,
           subject: `Hello ${username}`,
           text: '<h1>Hello from gmail email using API</h1>',
-          html: `Verify token <a href="http://localhost:8000/login?token=${token}&username=${username}">Klik disini<a>`,
+          html: `Verify token <a href="http://localhost:3000/login?token=${token}&username=${username}">Klik disini<a>`,
         })
         .then(result => console.log('Email sent...', result))
         .catch(error => console.log(error.message));
@@ -113,6 +111,10 @@ export const getAttendanceById = async (req, res) => {
 } catch (err) {
   errorResponse(req, res, {error})
 }
+}
+
+export const getLateAttendance = async(req, res) => {
+  
 }
 
 export const getUserById = async (req, res) => {
