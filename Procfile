@@ -1,1 +1,0 @@
-worker: YOUR_COMMAND
