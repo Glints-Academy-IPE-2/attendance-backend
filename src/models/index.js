@@ -47,14 +47,14 @@ db.sequelize = sequelize;
 // db.User.hasMany(db.Address);
 // db.Address.belongsTo(db.User);
 
-db.user = require('./user')(sequelize, Sequelize);
-db.attendance = require('./attendance')(sequelize, Sequelize);  
-db.userAttendance = require('./userAttendance')(sequelize, Sequelize);
+db.user = require('./user.js')(sequelize, Sequelize);
+db.attendance = require('./attendance.js')(sequelize, Sequelize);
 
-export const User1 = db.user.hasMany(db.attendance);
-export const Attendance = db.attendance.belongsTo(db.user);
-export const userAttendance = db.userAttendance.belongsTo(db.user);
-export const User2 = db.userAttendance.belongsTo(db.attendance);
+db.user.hasMany(db.attendance, { as: "attendance" });
+db.attendance.belongsTo(db.user, {
+  foreignKey: "id",
+  as: "user",
+});
 
 
 module.exports = db;

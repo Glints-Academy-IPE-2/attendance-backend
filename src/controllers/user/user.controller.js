@@ -3,14 +3,13 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import axios from 'axios';
 import {
-  User,
-  Attendances
-} from '../../models';
-import {
   successResponse,
   errorResponse
 } from '../../helpers';
 
+const db = require("../../models");
+const User = db.user;
+const Attendance = db.attendance;
 // send email 
 const nodemailer = require('nodemailer');
 const {
@@ -381,27 +380,33 @@ export const updateUserById = async (req, res) => {
 
 export const checkin = async (req, res) => {
   try {
-    // join id attendance to id user
-    Attendances.update({
-      checkin: req.body.checkin
-    }, {
-      where: {
-        id: req.params.id
-      }
-    }).then(result => res.json(result));
-    // return res.status(200).send('todos');
+    const {id} = req.params;
+    const {checkin} = req.body;
+
+    Attendance.create({
+      checkin: checkin,
+      UserId: id
+    })
+    .then((attendance) => {
+      successResponse(req, res, {attendance})
+    })
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
 };
 
-
 export const checkout = async (req, res) => {
   try {
-    const {
-      createdAt
-    } = req.body;
-    // return res.status(200).send('checkout');
+    const {id} = req.params;
+    const {checkout} = req.body;
+
+    Attendance.create({
+      checkout: checkout,
+      UserId: id
+    })
+    .then((attendance) => {
+      successResponse(req, res, {attendance})
+    })
   } catch (error) {
     return errorResponse(req, res, error.message);
   }

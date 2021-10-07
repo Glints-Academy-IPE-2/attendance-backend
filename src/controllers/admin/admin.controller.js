@@ -1,7 +1,10 @@
 /* eslint-disable consistent-return */
-import {
-  User, Attendance
-} from '../../models';
+const db = require("../../models");
+const User = db.user;
+const Attendance = db.attendance;
+// import {
+//   User, Attendance
+// } from '../../models';
 import {
   successResponse,
   errorResponse,
@@ -15,7 +18,7 @@ const jwt = require('jsonwebtoken');
 
 export const approveUser = async (req, res) => {
   try {
-    
+
 
     const {
       token,
@@ -23,27 +26,38 @@ export const approveUser = async (req, res) => {
 
     jwt.verify(token, process.env.SECRET);
 
-    const [updated] = await User.update({ isApproved: true }, {
-      where: { verifiedToken: token },
+    const [updated] = await User.update({
+      isApproved: true
+    }, {
+      where: {
+        verifiedToken: token
+      },
     });
 
     const user = await User.findOne({
-      where: { verifiedToken: token },
+      where: {
+        verifiedToken: token
+      },
     });
 
     console.log(token);
-    
+
     if (updated) {
-      const { email, username } = await User.findOne({
-        where: { verifiedToken: token },
+      const {
+        email,
+        username
+      } = await User.findOne({
+        where: {
+          verifiedToken: token
+        },
       });
       sendMail({
-        from: 'This is from IPE <testingalvi@gmail.com>',
-        to: email,
-        subject: `Hello ${username}`,
-        text: '<h1>Hello from gmail email using API</h1>',
-        html: `Verify token <a href="http://localhost:8000/login?token=${token}&username=${username}">Klik disini<a>`,
-      })
+          from: 'This is from IPE <testingalvi@gmail.com>',
+          to: email,
+          subject: `Hello ${username}`,
+          text: '<h1>Hello from gmail email using API</h1>',
+          html: `Verify token <a href="http://localhost:8000/login?token=${token}&username=${username}">Klik disini<a>`,
+        })
         .then(result => console.log('Email sent...', result))
         .catch(error => console.log(error.message));
     }
@@ -74,17 +88,40 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-// not yet
 export const getAllAttendance = async (req, res) => {
   try {
-    const users = await User.findAll({ include: Attendance });
-    // console.log(JSON.stringify(users, null, 2));
-    return successResponse(req, res, {users})
-
+    return User.findAll({
+      include: ['attendance'],
+    }).then((user) => {
+      return successResponse(req, res, {
+        user
+      })
+    })
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
 };
+
+export const getAttendanceById = async (req, res) => {
+  try{
+  User.findByPk(req.params.id, {
+    include: [{
+      model: Attendance,
+      as: "attendance"
+    }]
+  }).then(user => {
+    successResponse(req, res, {user})
+  })
+} catch (err) {
+  errorResponse(req, res, {error})
+}
+}
+
+// export const getLateAttendance = async (req, res) => {
+//   try {
+
+//   }
+// };
 
 export const getUserById = async (req, res) => {
   try {
@@ -119,18 +156,20 @@ export const deleteUserById = async (req, res) => {
 
     User.destroy({
       where: {
-         id: userId 
+        id: userId
       }
       // jumlah baris yang sudah terdelete
-   }).then(function(rowDeleted){ 
-     if(rowDeleted === 1){
-        successResponse(req, res, {rowDeleted})
+    }).then(function (rowDeleted) {
+      if (rowDeleted === 1) {
+        successResponse(req, res, {
+          rowDeleted
+        })
       }
-   }, function(err){
-       console.log(err); 
-   });
+    }, function (err) {
+      console.log(err);
+    });
 
-  // return successResponse(req, res, "User successfully deleted.")
+    // return successResponse(req, res, "User successfully deleted.")
 
   } catch (error) {
     return errorResponse(req, res, error.message);

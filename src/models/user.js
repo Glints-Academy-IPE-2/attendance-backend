@@ -1,8 +1,5 @@
 'use strict';
-const db = {};
-const User1 = require("./index")
-const Attendance = require("./index")
-const userAttendance = require("./index")
+// const models = require('./index');
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
@@ -58,10 +55,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {});
   User.associate = function (models) {
-    // db.user.hasMany(db.attendance);
-    // db.attendance.belongsTo(db.user);
-    // db.userAttendance.belongsTo(db.user);
-    User1, Attendance, userAttendance
+    // User.hasMany(model.attendance,{as: 'attendance', foreignKey: 'id'})
   };
   return User;
 };

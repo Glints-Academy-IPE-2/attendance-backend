@@ -1,7 +1,4 @@
 'use strict';
-const db = {};
-const userAttendance = require("./index")
-const User2 = require("./index")
 
 module.exports = (sequelize, DataTypes) => {
   const UserAttendance = sequelize.define('UserAttendance', {
@@ -34,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {});
   UserAttendance.associate = function (models) {
-    userAttendance, User2
+    
   };
   return UserAttendance;
 };

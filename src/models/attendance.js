@@ -1,8 +1,4 @@
 'use strict';
-const db = {};
-const User1 = require("./index")
-const Attendance = require("./index")
-const User2 = require("./index")
 
 module.exports = (sequelize, DataTypes) => {
   const Attendances = sequelize.define('Attendances', {
@@ -20,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    id_user: {
+    UserId: {
       type: DataTypes.STRING,
       allowNull: false
     },
@@ -36,7 +32,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {});
   Attendances.associate = function (models) {
-    User1, Attendance, User2
   };
 
   Attendances.init({

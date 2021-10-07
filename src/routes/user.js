@@ -17,13 +17,13 @@ const router = express.Router();
 router.get('/login/:token/:username', userController.checkVerified)
 
 router.post(
-    "/checkin", 
+    "/checkin/:id", 
     validate(userValidator.checkin),
     userController.checkin
   );
 
 router.post(
-  "/checkout",
+  "/checkout/:id",
   validate(userValidator.checkout),
   userController.checkout
 );
