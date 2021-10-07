@@ -1,4 +1,5 @@
-'use strict';
+
+
 module.exports = {
   up: async (queryInterface, DataTypes) => {
     await queryInterface.createTable('Attendances', {
@@ -6,7 +7,7 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
       },
       checkin: {
         type: DataTypes.DATE,
@@ -18,21 +19,21 @@ module.exports = {
       },
       UserId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
-        defaultValue: new Date()
+        defaultValue: new Date(),
       },
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE,
-        defaultValue: new Date()
-      }
+        defaultValue: new Date(),
+      },
     });
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('Attendances');
-  }
+  },
 };
