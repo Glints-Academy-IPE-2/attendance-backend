@@ -36,7 +36,7 @@ module.exports = {
       isAdmin: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: false
+        defaultValue: true
       },
       isApproved: {
         type: DataTypes.BOOLEAN,
