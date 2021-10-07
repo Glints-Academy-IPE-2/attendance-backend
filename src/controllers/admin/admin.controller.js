@@ -18,7 +18,7 @@ const jwt = require('jsonwebtoken');
 
 export const approveUser = async (req, res) => {
   try {
-
+    
 
     const {
       token,
@@ -56,7 +56,7 @@ export const approveUser = async (req, res) => {
           to: email,
           subject: `Hello ${username}`,
           text: '<h1>Hello from gmail email using API</h1>',
-          html: `Verify token <a href="http://localhost:8000/login?token=${token}&username=${username}">Klik disini<a>`,
+          html: `Verify token <a href="http://localhost:3000/login?token=${token}&username=${username}">Klik disini<a>`,
         })
         .then(result => console.log('Email sent...', result))
         .catch(error => console.log(error.message));
@@ -77,8 +77,6 @@ export const getAllUsers = async (req, res) => {
         ['createdAt', 'DESC'],
         ['username', 'ASC'],
       ],
-      // offset: (page - 1) * limit,
-      // limit,
     });
     return successResponse(req, res, {
       users,
