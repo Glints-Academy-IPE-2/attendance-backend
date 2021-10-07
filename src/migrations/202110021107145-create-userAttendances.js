@@ -14,6 +14,16 @@ module.exports = {
         allowNull: false,
         defaultValue: "343512"
       },
+      user_id: {
+        type: DataTypes.INTEGER,
+        required: true,
+        ref: "User"
+      },
+      attendance_id: {
+        type: DataTypes.INTEGER,
+        require: true,
+        ref: "Attendance"
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

@@ -1,6 +1,6 @@
 /* eslint-disable consistent-return */
 import {
-  User,
+  User, Attendance
 } from '../../models';
 import {
   successResponse,
@@ -9,7 +9,6 @@ import {
 import {
   sendMail
 } from '../user/user.controller';
-import Attendances from '../../models';
 
 const jwt = require('jsonwebtoken');
 
@@ -55,6 +54,8 @@ export const approveUser = async (req, res) => {
   }
 };
 
+
+
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.findAndCountAll({
@@ -76,15 +77,10 @@ export const getAllUsers = async (req, res) => {
 // not yet
 export const getAllAttendance = async (req, res) => {
   try {
-    const attendance = await Attendances.findAndCountAll({
-      order: [
-        ['checkin'],
-        ['checkout'],
-      ]
-    });
-    return successResponse(req, res, {
-      attendance
-    })
+    const users = await User.findAll({ include: Attendance });
+    // console.log(JSON.stringify(users, null, 2));
+    return successResponse(req, res, {users})
+
   } catch (error) {
     return errorResponse(req, res, error.message);
   }

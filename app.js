@@ -11,7 +11,6 @@ import apiMiddleware from "./src/middleware/apiAuth";
 import adminMiddleware from "./src/middleware/adminAuth";
 import errorHandler from "./src/middleware/errorHandler";
 
-
 dotenv.config();
 require("./src/config/sequelize");
 

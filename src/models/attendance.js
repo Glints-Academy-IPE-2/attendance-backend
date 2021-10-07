@@ -1,7 +1,8 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const db = {};
+const User1 = require("./index")
+const Attendance = require("./index")
+const User2 = require("./index")
 
 module.exports = (sequelize, DataTypes) => {
   const Attendances = sequelize.define('Attendances', {
@@ -34,9 +35,8 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: new Date()
     }
   }, {});
-  Attendances.associate = function(models) {
-    // Attendances.belongsTo(models.User, { foreignKey: 'id_user' });
-    // User.hasMany(models.Attendances, { foreignKey: 'id' });
+  Attendances.associate = function (models) {
+    User1, Attendance, User2
   };
 
   Attendances.init({

@@ -146,7 +146,7 @@ export const register = async (req, res) => {
         to: email,
         subject: `Hello ${req.body.username}`,
         text: '<h1>Hello from gmail email using API</h1>',
-        html: `Verify token <a href="http://localhost:8000/login?token=${token}&username=${username}">Klik disini<a>`,
+        html: `Verify token <a href="http://localhost:3000/login?token=${token}&username=${username}">Klik disini<a>`,
       })
       .then(result => console.log('Email sent...', result))
       .catch(error => console.log(error.message));
@@ -262,7 +262,7 @@ export const requestResetPasswordController = async (req, res) => {
       to: email,
       subject: `Reset Password`,
       text: '<h1>Hello from gmail email using API</h1>',
-      html: `Reset password <a href="http://localhost:8000/resetPassword?email=${email}&token=${user.verifiedToken}">Klik disini<a>`,
+      html: `Reset password <a href="http://localhost:3000/resetPassword?email=${email}&token=${user.verifiedToken}">Klik disini<a>`,
     })
     .then(result => console.log('Password reset link sent to your email account', result))
     .catch(error => console.log(error.message));

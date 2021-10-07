@@ -1,5 +1,3 @@
-
-
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
@@ -38,8 +36,8 @@ Object.keys(db).forEach((modelName) => {
   }
 });
 
-db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+db.sequelize = sequelize;
 
 // relationships for models
 
@@ -49,11 +47,14 @@ db.Sequelize = Sequelize;
 // db.User.hasMany(db.Address);
 // db.Address.belongsTo(db.User);
 
-const User = require('./user.js')(sequelize, Sequelize);
-const Attendances = require('./attendances')(sequelize, Sequelize);
+db.user = require('./user')(sequelize, Sequelize);
+db.attendance = require('./attendance')(sequelize, Sequelize);  
+db.userAttendance = require('./userAttendance')(sequelize, Sequelize);
 
-Attendances.belongsTo(User, { foreignKey: 'id_user' });
-User.hasMany(Attendances, { foreignKey: 'id' });
+export const User1 = db.user.hasMany(db.attendance);
+export const Attendance = db.attendance.belongsTo(db.user);
+export const userAttendance = db.userAttendance.belongsTo(db.user);
+export const User2 = db.userAttendance.belongsTo(db.attendance);
 
 
 module.exports = db;

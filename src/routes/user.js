@@ -28,6 +28,6 @@ router.post(
   userController.checkout
 );
 
-router.put("/location/:id ", userController.getLocation);
+router.put("/location/:id", userController.getLocation);
 
 module.exports = router;
