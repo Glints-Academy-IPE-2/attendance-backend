@@ -119,7 +119,13 @@ export const getAttendanceById = async (req, res) => {
 
 // export const getLateAttendance = async (req, res) => {
 //   try {
+//     User.findAll({
+//       include: ['attendance'],
+//       where: (`SELECT count(*) FROM `)
+//     })
 
+//   } catch (error) {
+//     errorResponse(req, res, {error})
 //   }
 // };
 
