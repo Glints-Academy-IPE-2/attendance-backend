@@ -21,10 +21,8 @@ router.post('/login', validate(userValidator.login), userController.login);
 
 router.post('/requestResetPassword', validate(userValidator.requestResetPassword), userController.requestResetPasswordController);
 
-router.post('/resetPassword/:userId/:token', userController.resetPasswordController);
+router.post('/resetPassword/:email/:token', userController.resetPasswordController);
 
-router.get('/verify-user', userController.verifyUser);
-
-router.get('/hi', userController.hi);
+router.get('/verify-user/:token', userController.verifyUser);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  const Token = sequelize.define('Token', {
+  const userAttendance = sequelize.define('userAttendance', {
     userId: {
       type: DataTypes.STRING,
       required: true,
@@ -18,8 +18,8 @@ module.exports = (sequelize, DataTypes) => {
       expires: 900,
     },
   }, {});
-  Token.associate = function(models) {
+  userAttendance.associate = function(models) {
     // associations can be defined here
   };
-  return Token;
+  return userAttendance;
 };

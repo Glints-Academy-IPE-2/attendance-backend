@@ -1,4 +1,6 @@
 'use strict';
+const {Attendances} = require('./attendances')
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     username: {
@@ -44,19 +46,16 @@ module.exports = (sequelize, DataTypes) => {
     latitude: {
       type: DataTypes.FLOAT,
       allowNull: true,
-      defaultValue: -112256432
+      defaultValue: null
     },
     longitude: {
       type: DataTypes.FLOAT,
       allowNull: true,
-      defaultValue: -121456432
+      defaultValue: null
     },
   }, {});
   User.associate = function(models) {
-    User.hasMany(models.Attendances, {
-      // as: "id",
-      // foreignKey: "id_user"
-    })
+    
   };
   return User;
 };

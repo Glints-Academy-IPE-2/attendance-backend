@@ -6,14 +6,22 @@ import {
   successResponse,
   errorResponse,
 } from '../../helpers';
-import { sendMail } from '../user/user.controller';
+import {
+  sendMail
+} from '../user/user.controller';
+import Attendances from '../../models';
 
 const jwt = require('jsonwebtoken');
 
 
 export const approveUser = async (req, res) => {
   try {
-    const { body: { token = '' } = {} } = req || {};
+    // const { body: { token = '' } = {} } = req || {};
+
+    const {
+      token,
+    } = req.params;
+
     jwt.verify(token, process.env.SECRET);
 
     const [updated] = await User.update({ isApproved: true }, {
@@ -66,11 +74,17 @@ export const getAllUsers = async (req, res) => {
 };
 
 // not yet
-export const allAttendances = async (req, res) => {
-  // eslint-disable-next-line no-empty
+export const getAllAttendance = async (req, res) => {
   try {
-
-
+    const attendance = await Attendances.findAndCountAll({
+      order: [
+        ['checkin'],
+        ['checkout'],
+      ]
+    });
+    return successResponse(req, res, {
+      attendance
+    })
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
@@ -87,12 +101,41 @@ export const getUserById = async (req, res) => {
         id
       },
     });
-   
-    if(!userId) {
+
+    if (!userId) {
       throw new Error('User not found in database');
     } else {
-      return successResponse(req, res, {userId})
+      return successResponse(req, res, {
+        userId
+      })
     }
+  } catch (error) {
+    return errorResponse(req, res, error.message);
+  }
+};
+
+
+export const deleteUserById = async (req, res) => {
+  try {
+    const {
+      userId
+    } = req.params;
+
+    User.destroy({
+      where: {
+         id: userId 
+      }
+      // jumlah baris yang sudah terdelete
+   }).then(function(rowDeleted){ 
+     if(rowDeleted === 1){
+        successResponse(req, res, {rowDeleted})
+      }
+   }, function(err){
+       console.log(err); 
+   });
+
+  // return successResponse(req, res, "User successfully deleted.")
+
   } catch (error) {
     return errorResponse(req, res, error.message);
   }

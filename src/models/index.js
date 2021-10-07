@@ -10,6 +10,7 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(`${__dirname}/../config/config.js`)[env];
 const db = {};
 
+
 let sequelize;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
@@ -48,9 +49,11 @@ db.Sequelize = Sequelize;
 // db.User.hasMany(db.Address);
 // db.Address.belongsTo(db.User);
 
-db.Users = require('./user.js')(sequelize, Sequelize);
-db.Attendances = require('./attendances')(sequelize, Sequelize);
+const User = require('./user.js')(sequelize, Sequelize);
+const Attendances = require('./attendances')(sequelize, Sequelize);
 
+Attendances.belongsTo(User, { foreignKey: 'id_user' });
+User.hasMany(Attendances, { foreignKey: 'id' });
 
 
 module.exports = db;

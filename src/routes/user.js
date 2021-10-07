@@ -14,16 +14,10 @@ const router = express.Router();
 //   userController.updateUserById
 // );
 
-// router.delete(
-//   "/deleteUser",
-//   validate(userValidator.deleteUser),
-//   userController.deleteUser
-// );
-
 router.get('/login/:token/:username', userController.checkVerified)
 
 router.post(
-    "/checkin",
+    "/checkin", 
     validate(userValidator.checkin),
     userController.checkin
   );
@@ -34,15 +28,6 @@ router.post(
   userController.checkout
 );
 
-// router.post(
-//   "/resetPassword",
-//   validate(userValidator.resetPassword),
-//   userController.resetPassword
-// );
+router.put("/location/:id ", userController.getLocation);
 
-// router.get(
-//   "/location",
-//   validate(userValidator.getLocation),
-//   userController.getLocation
-// );
 module.exports = router;

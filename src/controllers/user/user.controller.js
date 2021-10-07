@@ -11,6 +11,7 @@ import {
   errorResponse
 } from '../../helpers';
 
+// send email 
 const nodemailer = require('nodemailer');
 const {
   google
@@ -163,11 +164,13 @@ export const register = async (req, res) => {
 
 export const verifyUser = async (req, res) => {
   try {
-    const {
-      body: {
-        token = ''
-      } = {}
-    } = req || {};
+    // const {
+    //   params: {
+    //     token = ''
+    //   } = {}
+    // } = req || {};
+
+    const {token} = req.params
 
     jwt.verify(token, process.env.SECRET);
 
@@ -260,19 +263,20 @@ export const requestResetPasswordController = async (req, res) => {
     if (!user) {
       throw new Error('Email not found');
     }
-    const token = jwt.sign({
-      user: {
-        email
-      }
-    }, process.env.SECRET
-    )
+    // const token = jwt.sign({
+    //   user: {
+    //     email,
+
+    //   }
+    // }, process.env.SECRET
+    // )
 
     sendMail({
       from: 'This is from IPE <testingalvi@gmail.com>',
       to: email,
       subject: `Reset Password`,
       text: '<h1>Hello from gmail email using API</h1>',
-      html: `Reset password <a href="http://localhost:8000/resetPassword?email=${email}&token=${token}">Klik disini<a>`,
+      html: `Reset password <a href="http://localhost:8000/resetPassword?email=${email}&token=${user.verifiedToken}">Klik disini<a>`,
     })
     .then(result => console.log('Password reset link sent to your email account', result))
     .catch(error => console.log(error.message));
@@ -283,17 +287,10 @@ export const requestResetPasswordController = async (req, res) => {
   }
 };
 
-export const hi = async  (req, res) => {
-  try {
-    return res.status(200).send('todos');
-  } catch (error) {
-    return errorResponse(req, res, error.message);
-  }
-}
 
 export const resetPasswordController = async (req, res) => {
   try {
-    const {userId, token} = req.params;
+    const {email, token} = req.params;
     const {password} = req.body;
     const updatePassword = await crypto.createHash('md5').update(password).digest('hex');
     
@@ -303,7 +300,7 @@ export const resetPasswordController = async (req, res) => {
       password: updatePassword
     }, {
       where: {
-        id: userId,
+        email: email,
         verifiedToken: token
       },
     });
@@ -320,7 +317,7 @@ export const resetPasswordController = async (req, res) => {
 
     sendMail({
       from: 'This is from IPE <testingalvi@gmail.com>',
-      to: `Hello ${"testingalvi@gmail.com"}`,
+      to: `Hello ${email}`,
       subject: `Reset Password`,
       text: '<h1>Hello from gmail email using API</h1>',
       html: `Reset password success.<a>`,
@@ -339,7 +336,7 @@ export const profile = async (req, res) => {
   try {
     const {
       user
-    } = req.user;
+    } = req.params;
     const userId = await User.findOne({
       where: {
         id: user,
@@ -358,6 +355,7 @@ export const getUserById = async (req, res) => {
     const {
       id
     } = req.params;
+    
     const [updated] = await User.update(req.body, {
       where: {
         id,
@@ -395,28 +393,6 @@ export const updateUserById = async (req, res) => {
   }
 };
 
-export const deleteUser = async (req, res) => {
-  try {
-    const {
-      id
-    } = req.params;
-    const deleted = await User.destroy({
-      where: {
-        id,
-      },
-    });
-    if (deleted) {
-      return res.status(204).send('User deleted');
-    }
-    return res.status(400).send('Failed to delete');
-
-    throw new Error('User not found');
-  } catch (error) {
-    return errorResponse(req, res, error.message);
-  }
-};
-
-
 export const checkin = async (req, res) => {
   try {
     // join id attendance to id user
@@ -446,11 +422,23 @@ export const checkout = async (req, res) => {
 };
 
 
-// not yet
-export const getLocation = async (req, res) => {
-  try {
-    return res.status(200).send('todos');
+export const getLocation = async (req, res, next) => {
+  try{
+  const {latitude, longitude} = req.body;
+    const {id} = req.params;
+
+    const insertLocation = await User.update({
+      latitude: latitude,
+      longitude: longitude
+    }, {
+      where: {
+        id: id
+      }
+    }).then(function(rowsUpdated) {
+     successResponse(req, res, {rowsUpdated})
+    })
+    .catch(next)
   } catch (error) {
-    return errorResponse(req, res, error.message);
+    return errorResponse(req, res, error.message)
   }
 };
