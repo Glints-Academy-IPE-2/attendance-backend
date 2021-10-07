@@ -2,13 +2,8 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const [users] = await queryInterface.sequelize.query(
-      'SELECT id from COURSES;',
-    );
-
-
     return queryInterface.bulkInsert('Attendances', [{
-      UserId: users[0].id,
+      UserId: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
     }]);
