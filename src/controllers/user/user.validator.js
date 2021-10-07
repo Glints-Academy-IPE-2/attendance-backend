@@ -1,4 +1,4 @@
-const Joi = require('joi');
+const Joi = require("joi");
 
 export const getOtherUserProfile = {
   body: {
@@ -15,20 +15,62 @@ export const changePassword = {
 
 export const register = {
   body: {
-    firstName: Joi.string().required(),
-    lastName: Joi.string().required(),
-    email: Joi.string()
-      .email()
-      .required(),
+    username: Joi.string().required(),
+    email: Joi.string().email().required(),
     password: Joi.string().required(),
   },
 };
 
 export const login = {
   body: {
-    email: Joi.string()
-      .email()
-      .required(),
+    email: Joi.string().email().required(),
     password: Joi.string().required(),
   },
 };
+
+export const updateUserById = {
+  body: {
+    
+  }
+}
+
+export const location = {
+  body: {
+
+  }
+}
+
+export const checkin = {
+  body: {
+    checkin: Joi.string().required()
+  }
+}
+
+export const checkout = {
+  body: {
+    checkout: Joi.string().required()
+  }
+}
+
+export const getLocation = {
+  body: {
+    
+  }
+}
+export const deleteUser = {
+  body: {
+    
+  }
+}
+export const requestResetPassword = {
+  body: {
+    email: Joi.string().email().required()
+  },  
+}
+
+export const resetPassword = {
+  body: {
+    password: Joi.string().required()
+    
+  },  
+}
