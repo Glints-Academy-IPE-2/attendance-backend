@@ -137,7 +137,7 @@ export const getUserById = async (req, res) => {
 
     const userId = await User.findOne({
       where: {
-        id
+        id,
       },
     });
 
