@@ -45,68 +45,6 @@ const isAdmin = (req, res, next) => {
   });
 };
 
-// const requestPasswordReset = async (email) => {
-//   const user = await User.findOne({
-//     email,
-//   });
-//   if (!user) throw new Error('Email does not exist');
-
-//   const token = await Token.findOne({
-//     userId: user.userId,
-//   });
-//   if (token) await token.deleteOne();
-
-//   const resetToken = crypto.randomBytes(32).toString('hex');
-//   const hash = await bcrypt.hash(resetToken, Number(bcryptSalt));
-
-//   await new Token({
-//     userId: user.userId,
-//     token: hash,
-//     createAt: Date.now(),
-//   }).save();
-
-//   const link = `${clientURL}/pub/passwordReset?token=${resetToken}&id=${user._id}`;
-
-//   sendEmail(
-//     user.email,
-//     'Password Reset Request', {
-//       name: user.name,
-//       link,
-//     },
-//     '../utils/email/equestResetPassword.handlebars',
-//   );
-//   return link;
-// };
-
-// const resetPassword = async (userId, token, password) => {
-//   const passwordResetToken = await Token.findOne({
-//     userId,
-//   });
-
-//   if (!passwordResetToken) {
-//     throw new Error('Invalid or expired password reset token');
-//   }
-
-//   const isValid = await bcrypt.compare(token, passwordResetToken.token);
-
-//   if (!isValid) {
-//     throw new Error('Invalid or expired password reset token!');
-//   }
-
-//   const hash = await bcrypt.hash(password, Number(bcryptSalt));
-
-//   await User.updateOne({
-//     id: userId,
-//   }, {
-//     $set: {
-//       password: hash,
-//     },
-//   }, {
-//     new: true,
-//   });
-// };
-
-
 const authJwt = {
   verifyToken,
   isAdmin,

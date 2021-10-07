@@ -2,12 +2,6 @@
 
 module.exports = (sequelize, DataTypes) => {
   const UserAttendance = sequelize.define('UserAttendance', {
-    id: {
-      type: DataTypes.STRING,
-      required: true,
-      primaryKey: true,
-      ref: "User",
-    },
     token: {
       type: DataTypes.STRING,
       allowNull: true,

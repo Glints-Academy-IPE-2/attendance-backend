@@ -17,7 +17,7 @@ module.exports = {
         allowNull: true,
       },
       UserId: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false
       },
       createdAt: {

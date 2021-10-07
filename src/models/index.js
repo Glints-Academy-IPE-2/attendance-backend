@@ -56,5 +56,4 @@ db.attendance.belongsTo(db.user, {
   as: "user",
 });
 
-
 module.exports = db;
