@@ -18,7 +18,7 @@ const jwt = require('jsonwebtoken');
 
 export const approveUser = async (req, res) => {
   try {
-    
+
 
     const {
       token,
@@ -56,7 +56,7 @@ export const approveUser = async (req, res) => {
           to: email,
           subject: `Hello ${username}`,
           text: '<h1>Hello from gmail email using API</h1>',
-          html: `Verify token <a href="http://localhost:3000/login?token=${token}&username=${username}">Klik disini<a>`,
+          html: `Verify token <a href="http://localhost:8000/login?token=${token}&username=${username}">Klik disini<a>`,
         })
         .then(result => console.log('Email sent...', result))
         .catch(error => console.log(error.message));
@@ -68,8 +68,6 @@ export const approveUser = async (req, res) => {
   }
 };
 
-
-
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.findAndCountAll({
@@ -77,6 +75,8 @@ export const getAllUsers = async (req, res) => {
         ['createdAt', 'DESC'],
         ['username', 'ASC'],
       ],
+      // offset: (page - 1) * limit,
+      // limit,
     });
     return successResponse(req, res, {
       users,
@@ -115,18 +115,6 @@ export const getAttendanceById = async (req, res) => {
 }
 }
 
-// export const getLateAttendance = async (req, res) => {
-//   try {
-//     User.findAll({
-//       include: ['attendance'],
-//       where: (`SELECT count(*) FROM `)
-//     })
-
-//   } catch (error) {
-//     errorResponse(req, res, {error})
-//   }
-// };
-
 export const getUserById = async (req, res) => {
   try {
     const {
@@ -135,7 +123,7 @@ export const getUserById = async (req, res) => {
 
     const userId = await User.findOne({
       where: {
-        id,
+        id
       },
     });
 
@@ -172,8 +160,6 @@ export const deleteUserById = async (req, res) => {
     }, function (err) {
       console.log(err);
     });
-
-    // return successResponse(req, res, "User successfully deleted.")
 
   } catch (error) {
     return errorResponse(req, res, error.message);

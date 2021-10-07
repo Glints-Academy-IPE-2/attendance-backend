@@ -11,12 +11,12 @@ module.exports = {
       username: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: "username"
+        defaultValue: "ipe2glints"
       },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: "user@gmail.com"
+        defaultValue: "testingalvi@gmail.com"
       },
       password: {
         type: DataTypes.STRING,
@@ -36,17 +36,17 @@ module.exports = {
       isAdmin: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: true
+        defaultValue: 0
       },
       isApproved: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: false,
+        defaultValue: 0,
       },
       isVerified: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: false
+        defaultValue: 0
       },
       latitude: {
         type: DataTypes.FLOAT,
