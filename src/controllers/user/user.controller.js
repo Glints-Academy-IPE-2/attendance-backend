@@ -23,7 +23,7 @@ const {
 const CLIENT_ID = '990618082111-ff735j3j5bc1222m0qc4h1bhqr67pomt.apps.googleusercontent.com';
 const CLIENT_SECRET = '5SZD6sV1Bp_O83kHFX0iveXk';
 const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
-const REFRESH_TOKEN = '1//0422SCXweBnP3CgYIARAAGAQSNwF-L9IrzLe-gd7fmhwtAxvhd0f61vYVRkIHSwMrU5L9LHldaipe9M8J-7PFYfNQTmqxjTYeBoc';
+const REFRESH_TOKEN = '1//041tKommfgnzPCgYIARAAGAQSNwF-L9IrdFmyVTToBudEADBLhWyaIIuR0jVcmHG_O0_a3ADYhHvc9mVfXbbPJpYAjfYA3ijPB3U';
 const oAuth2Client = new google.auth.OAuth2(
   CLIENT_ID,
   CLIENT_SECRET,
@@ -51,7 +51,7 @@ export const sendMail = async ({
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRET,
         refreshToken: REFRESH_TOKEN,
-        accessToken,
+        accessToken: accessToken,
       },
     });
 
@@ -163,7 +163,9 @@ export const register = async (req, res) => {
 
 export const verifyUser = async (req, res) => {
   try {
-    const {token} = req.params
+    const {
+      token
+    } = req.params
     jwt.verify(token, process.env.SECRET);
 
     const [updated] = await User.update({
@@ -246,7 +248,9 @@ export const checkVerified = async (req, res) => {
 
 export const requestResetPasswordController = async (req, res) => {
   try {
-    const {email} = req.body
+    const {
+      email
+    } = req.body
     const user = await User.findOne({
       where: {
         email
@@ -257,14 +261,14 @@ export const requestResetPasswordController = async (req, res) => {
     }
 
     sendMail({
-      from: 'This is from IPE <testingalvi@gmail.com>',
-      to: email,
-      subject: `Reset Password`,
-      text: '<h1>Hello from gmail email using API</h1>',
-      html: `Reset password <a href="http://localhost:3000/resetPassword?email=${email}&token=${user.verifiedToken}">Klik disini<a>`,
-    })
-    .then(result => console.log('Password reset link sent to your email account', result))
-    .catch(error => console.log(error.message));
+        from: 'This is from IPE <testingalvi@gmail.com>',
+        to: email,
+        subject: `Reset Password`,
+        text: '<h1>Hello from gmail email using API</h1>',
+        html: `Reset password <a href="http://localhost:3000/resetPassword?email=${email}&token=${user.verifiedToken}">Klik disini<a>`,
+      })
+      .then(result => console.log('Password reset link sent to your email account', result))
+      .catch(error => console.log(error.message));
 
     return successResponse(req, res, {})
   } catch (error) {
@@ -275,10 +279,15 @@ export const requestResetPasswordController = async (req, res) => {
 
 export const resetPasswordController = async (req, res) => {
   try {
-    const {email, token} = req.params;
-    const {password} = req.body;
+    const {
+      email,
+      token
+    } = req.params;
+    const {
+      password
+    } = req.body;
     const updatePassword = await crypto.createHash('md5').update(password).digest('hex');
-    
+
     jwt.verify(token, process.env.SECRET);
 
     const [updated] = await User.update({
@@ -289,7 +298,7 @@ export const resetPasswordController = async (req, res) => {
         verifiedToken: token
       },
     });
-    
+
     if (updated) {
       await User.findOne({
         where: {
@@ -301,17 +310,19 @@ export const resetPasswordController = async (req, res) => {
     }
 
     sendMail({
-      from: 'This is from IPE <testingalvi@gmail.com>',
-      to: `Hello ${email}`,
-      subject: `Reset Password`,
-      text: '<h1>Hello from gmail email using API</h1>',
-      html: `Reset password success.<a>`,
-    })
-    .then(result => console.log('password reset sucessfully.', result))
-    .catch(error => console.log(error.message));
+        from: 'This is from IPE <testingalvi@gmail.com>',
+        to: `Hello ${email}`,
+        subject: `Reset Password`,
+        text: '<h1>Hello from gmail email using API</h1>',
+        html: `Reset password success.<a>`,
+      })
+      .then(result => console.log('password reset sucessfully.', result))
+      .catch(error => console.log(error.message));
 
-    return successResponse(req, res, {updatePassword})
-    
+    return successResponse(req, res, {
+      updatePassword
+    })
+
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
@@ -340,7 +351,7 @@ export const getUserById = async (req, res) => {
     const {
       id
     } = req.params;
-    
+
     const [updated] = await User.update(req.body, {
       where: {
         id,
@@ -380,16 +391,22 @@ export const updateUserById = async (req, res) => {
 
 export const checkin = async (req, res) => {
   try {
-    const {id} = req.params;
-    const {checkin} = req.body;
+    const {
+      id
+    } = req.params;
+    const {
+      checkin
+    } = req.body;
 
     Attendance.create({
-      checkin: checkin,
-      UserId: id
-    })
-    .then((attendance) => {
-      successResponse(req, res, {attendance})
-    })
+        checkin: checkin,
+        UserId: id
+      })
+      .then((attendance) => {
+        successResponse(req, res, {
+          attendance
+        })
+      })
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
@@ -397,38 +414,53 @@ export const checkin = async (req, res) => {
 
 export const checkout = async (req, res) => {
   try {
-    const {id} = req.params;
-    const {checkout} = req.body;
+    const {
+      id
+    } = req.params;
+    const {
+      checkout
+    } = req.body;
 
     Attendance.create({
-      checkout: checkout,
-      UserId: id
-    })
-    .then((attendance) => {
-      successResponse(req, res, {attendance})
-    })
+        checkout: checkout,
+        UserId: id
+      })
+      .then((attendance) => {
+        successResponse(req, res, {
+          attendance
+        })
+      })
   } catch (error) {
     return errorResponse(req, res, error.message);
   }
 };
 
 export const getLocation = async (req, res, next) => {
-  try{
-  const {latitude, longitude} = req.body;
-    const {id} = req.params;
+  try {
+    const {
+      latitude,
+      longitude
+    } = req.body;
+    const {
+      id
+    } = req.params;
 
     const insertLocation = await User.update({
-      latitude: latitude,
-      longitude: longitude
-    }, {
-      where: {
-        id: id
-      }
-    }).then(function(rowsUpdated) {
-     successResponse(req, res, {rowsUpdated})
-    })
-    .catch(next)
+        latitude: latitude,
+        longitude: longitude
+      }, {
+        where: {
+          id: id
+        }
+      }).then(function (rowsUpdated) {
+        successResponse(req, res, {
+          rowsUpdated
+        })
+      })
+      .catch(next)
   } catch (error) {
     return errorResponse(req, res, error.message)
   }
 };
+
+
