@@ -113,9 +113,19 @@ export const getAttendanceById = async (req, res) => {
 }
 }
 
-export const getLateAttendance = async(req, res) => {
+// export const getLateAttendance = async (req, res) => {
   
-}
+// }
+
+// export const getMonthAttendance = async (req, res) => {
+//   try {
+//     Attendance.findByPk({
+//       where: {}
+//     })
+//   } catch (error) {
+//     return errorResponse(req, res, {});
+//   }
+// }
 
 export const getUserById = async (req, res) => {
   try {

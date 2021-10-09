@@ -31,7 +31,7 @@ app.use("/api/user", userRoutes);
 app.use(errorHandler);
 
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to bezkoder application." });
+  res.json({ message: "The server has started." });
 });
 
 
