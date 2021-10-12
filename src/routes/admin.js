@@ -12,7 +12,7 @@ router.delete('/delete-user/:userId', adminController.deleteUserById);
 
 router.get('/get-attendance', adminController.getAllAttendance)
 router.get('/get-attendance/:id', adminController.getAttendanceById)
-// router.get('/get-late-attendance', adminController.getLateAttendance)
+router.get('/get-late-attendance/:month/:id', adminController.getLateAttendance)
 // router.get('/get-attendance-month', adminController.getMonthAttendance)
 
 
