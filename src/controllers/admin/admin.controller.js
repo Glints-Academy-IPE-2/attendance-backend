@@ -54,7 +54,7 @@ export const approveUser = async (req, res) => {
           to: email,
           subject: `Hello ${username}`,
           text: '<h1>Hello from gmail email using API</h1>',
-          html: `Verify token <a href="http://localhost:3000/login?token=${token}&username=${username}">Klik disini<a>`,
+          html: `Verify token <a href="https://ipe2-attendance.herokuapp.com/login?token=${token}&username=${username}">Klik disini<a>`,
         })
         .then(result => console.log('Email sent...', result))
         .catch(error => console.log(error.message));

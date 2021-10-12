@@ -265,7 +265,7 @@ export const requestResetPasswordController = async (req, res) => {
         to: email,
         subject: `Reset Password`,
         text: '<h1>Hello from gmail email using API</h1>',
-        html: `Reset password <a href="http://localhost:3000/resetPassword?email=${email}&token=${user.verifiedToken}">Klik disini<a>`,
+        html: `Reset password <a href="https://ipe2-attendance.herokuapp.com/resetPassword?email=${email}&token=${user.verifiedToken}">Klik disini<a>`,
       })
       .then(result => console.log('Password reset link sent to your email account', result))
       .catch(error => console.log(error.message));
