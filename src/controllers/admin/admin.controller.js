@@ -113,9 +113,34 @@ export const getAttendanceById = async (req, res) => {
 }
 }
 
-// export const getLateAttendance = async (req, res) => {
+export const getLateAttendance = async (req, res) => {
+  try {
+    try {
+      const {id, month} = req.params; 
   
-// }
+      await Attendance.findAll({
+        where: {UserId: id, month: month}
+      })
+  
+      await Attendance.count({
+        where : {month: month}
+      }).then((user) => {
+        const count = user / 2
+        if(count < 3) {
+          successResponse(req, res, "This user didn't come more than 3 days this month")
+        } else {
+          successResponse(req, res, "This user passed")
+        }
+      }) 
+  
+    } catch (error) {
+      return errorResponse(req, res, {error})
+    } 
+    
+  } catch (error) {
+    return errorResponse(req, res, {})
+  }
+}
 
 // export const getMonthAttendance = async (req, res) => {
 //   try {

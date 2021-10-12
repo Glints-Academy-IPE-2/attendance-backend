@@ -51,12 +51,12 @@ module.exports = {
     latitude: {
       type: DataTypes.FLOAT,
       allowNull: true,
-      defaultValue: -123456432,
+      defaultValue: 0.0,
     },
     longitude: {
       type: DataTypes.FLOAT,
       allowNull: true,
-      defaultValue: -123456432,
+      defaultValue: 0.0,
     },
     createdAt: {
       type: DataTypes.DATE,
