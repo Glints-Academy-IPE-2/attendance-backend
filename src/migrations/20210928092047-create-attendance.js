@@ -17,6 +17,11 @@ module.exports = {
         type: DataTypes.DATE,
         allowNull: true,
       },
+      month: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: "october"
+      },
       UserId: {
         type: DataTypes.INTEGER,
         allowNull: false,
