@@ -3,7 +3,7 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('userAttendances', [{
-      token: '74981974',
+      month: "October",
       createdAt: new Date(),
       updatedAt: new Date()
     }]);
